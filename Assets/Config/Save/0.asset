@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 354d37aa4fcd41debcefca971e0af21a, type: 3}
+  m_Name: 0
+  m_EditorClassIdentifier: 
+  itemSlotSaveData:
+  - itemSlotIndex: 0
+    itemId: 6
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: c03ed93f5ef0f6e40b60c8e44788bdf8, type: 2}
+      value: 200
+  - itemSlotIndex: 1
+    itemId: 5
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: 553237db5a604614a915a61559e8daaf, type: 2}
+      value: 100
+    - attribute: {fileID: 11400000, guid: c82b8f439b8824e4cb71aea8bb4328f2, type: 2}
+      value: 100
+    - attribute: {fileID: 11400000, guid: 83945eef9aebf9245a428b94a42af87e, type: 2}
+      value: 100
+    - attribute: {fileID: 11400000, guid: d5445944aa7ea32419def3f9ab3747e0, type: 2}
+      value: 100
+    - attribute: {fileID: 11400000, guid: 62e473e85984b8142b7b28df24a27bd9, type: 2}
+      value: 100
+  - itemSlotIndex: 2
+    itemId: 4
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: 98bb133a16102d84c9e6c482db79546a, type: 2}
+      value: 0
+    - attribute: {fileID: 11400000, guid: 5bc3c311b66873d40bb7c9af6a8dd893, type: 2}
+      value: 200
+  - itemSlotIndex: 3
+    itemId: 6
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: cb474d3a538495b40b10b246896b8b2b, type: 2}
+      value: 200
+  - itemSlotIndex: 4
+    itemId: 6
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: c03ed93f5ef0f6e40b60c8e44788bdf8, type: 2}
+      value: 200
+  - itemSlotIndex: 5
+    itemId: 6
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: 98bb133a16102d84c9e6c482db79546a, type: 2}
+      value: 200
