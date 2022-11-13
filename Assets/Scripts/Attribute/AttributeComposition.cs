@@ -14,6 +14,20 @@ public class AttributeComposition : ScriptableObject
     [LabelText("所需时间")] public int requiredTime;
     [LabelText("所需温度")] public int requiredTemperature;
     [LabelText("最终属性")] public Attribute finalAttribute;
+
+    [LabelText("产出率")] public int outputRate = 100;
+
+    //产出量
+    public int OutputValue()
+    {
+        int value = 0;
+        foreach (AttributeCompositionProportion attributeCompositionProportion in attributeGroup)
+        {
+            value += attributeCompositionProportion.value;
+        }
+
+        return (int)(value * (outputRate / 100f));
+    }
 }
 
 [Serializable]

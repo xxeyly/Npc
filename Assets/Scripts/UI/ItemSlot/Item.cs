@@ -19,6 +19,37 @@ public class Item : ScriptableObject
 
     [LabelText("物品属性")] [TableList] public List<AttributeValue> attributeValueList = new List<AttributeValue>();
 
+    public bool ContainsAttribute(Attribute attribute)
+    {
+        foreach (AttributeValue attributeValue in attributeValueList)
+        {
+            if (attributeValue.attribute.GetAttributeType() == attribute.GetAttributeType())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void AddAttributeValue(AttributeValue attributeValue)
+    {
+        //相同属性
+        bool identical = false;
+        foreach (AttributeValue value in attributeValueList)
+        {
+            if (value.attribute.GetAttributeType() == attributeValue.attribute.GetAttributeType())
+            {
+                value.value += attributeValue.value;
+                identical = true;
+            }
+        }
+
+        if (!identical)
+        {
+            attributeValueList.Add(attributeValue);
+        }
+    }
 
     public Item GetNewItem()
     {

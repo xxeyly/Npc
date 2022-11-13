@@ -13,6 +13,7 @@ namespace XFramework
         public ItemSlotDataSaveSceneComponent itemSlotDataSaveSceneComponent = new ItemSlotDataSaveSceneComponent();
         public ItemAttributeShow itemAttributeShow = new ItemAttributeShow();
         public PersonalBelongings personalBelongings = new PersonalBelongings();
+        public SmallPharmaceuticalApparatus smallPharmaceuticalApparatus = new SmallPharmaceuticalApparatus();
         public TempDragItemSlot tempDragItemSlot = new TempDragItemSlot();
         public AtlasSceneComponent atlasSceneComponent = new AtlasSceneComponent();
         public AttributeCompositionSceneComponent attributeCompositionSceneComponent = new AttributeCompositionSceneComponent();
@@ -21,6 +22,10 @@ namespace XFramework
             public void SaveItemSlotSaveDataGroup(int arg0, List<ItemSlot> arg1)
             {
                 Instance.ExecuteEvent("ItemSlotDataSaveSceneComponent_SaveItemSlotSaveDataGroup",arg0,arg1);
+            }
+            public void SaveSmallPharmaceuticalApparatusSaveDataGroup(int arg0, SmallPharmaceuticalApparatusSaveDataGroup arg1)
+            {
+                Instance.ExecuteEvent("ItemSlotDataSaveSceneComponent_SaveSmallPharmaceuticalApparatusSaveDataGroup",arg0,arg1);
             }
             public void SetItemSlotDataSaveEvent(ItemSlotDataSave arg0)
             {
@@ -41,6 +46,10 @@ namespace XFramework
             public  ItemSlotSaveDataGroup GetItemSlotSaveDataGroup(int arg0)
             {
                 return Instance.ExecuteReturnEvent<int, ItemSlotSaveDataGroup>("ItemSlotDataSaveSceneComponent_GetItemSlotSaveDataGroup",arg0);
+            }
+            public  SmallPharmaceuticalApparatusSaveDataGroup GetSmallPharmaceuticalApparatusSaveDataGroup(int arg0)
+            {
+                return Instance.ExecuteReturnEvent<int, SmallPharmaceuticalApparatusSaveDataGroup>("ItemSlotDataSaveSceneComponent_GetSmallPharmaceuticalApparatusSaveDataGroup",arg0);
             }
         }
         public class ItemAttributeShow
@@ -75,6 +84,13 @@ namespace XFramework
             public  bool AddItem(Item arg0)
             {
                 return Instance.ExecuteReturnEvent<Item, bool>("PersonalBelongings_AddItem",arg0);
+            }
+        }
+        public class SmallPharmaceuticalApparatus
+        {
+            public void InitStorageItem()
+            {
+                Instance.ExecuteEvent("SmallPharmaceuticalApparatus_InitStorageItem");
             }
         }
         public class TempDragItemSlot
@@ -113,9 +129,9 @@ namespace XFramework
         }
         public class AttributeCompositionSceneComponent
         {
-            public  AttributeComposition GetQualifiedAttributeComposition(List<Attribute> arg0, int arg1)
+            public  List<AttributeComposition> GetQualifiedAttributeComposition(List<Attribute> arg0)
             {
-                return Instance.ExecuteReturnEvent<List<Attribute>, int, AttributeComposition>("AttributeCompositionSceneComponent_GetQualifiedAttributeComposition",arg0,arg1);
+                return Instance.ExecuteReturnEvent<List<Attribute>, List<AttributeComposition>>("AttributeCompositionSceneComponent_GetQualifiedAttributeComposition",arg0);
             }
         }
 

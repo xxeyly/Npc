@@ -41,7 +41,6 @@ public class SmallPharmaceuticalApparatus : BaseWindow
     [BoxGroup("水量")] [LabelText("水量上限")] [SerializeField]
     private int waterMax;
 
-    private ItemSlot _waterTank;
 
     [BoxGroup("温度")] [LabelText("当前温度")] [SerializeField]
     private int currentTemperature;
@@ -66,7 +65,9 @@ public class SmallPharmaceuticalApparatus : BaseWindow
     [BoxGroup("温度")] [LabelText("能量燃烧结束任务")]
     private int _energyBurningEndTimeTask;
 
+    private ItemSlot _waterTank;
     private ItemSlot _energyTank;
+    private ItemSlot _produce;
     [SerializeField] [LabelText("配方持续时间")] private Dictionary<AttributeComposition, int> attributeCompositionDurationDict = new Dictionary<AttributeComposition, int>();
 
     [SerializeField] [LabelText("燃烧间隔")] private int combustionInterval = 1;
@@ -129,7 +130,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     private void EnergyBurningEnd()
     {
-        Debug.Log("一波能量燃烧完毕");
+        // Debug.Log("一波能量燃烧完毕");
         //还有缓存能量
         if (energyCache > 0)
         {
@@ -173,8 +174,11 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         //变量查找结束
         BindUi(ref _waterTank, "WaterPanel/WaterTank");
         BindUi(ref _energyTank, "EnergyPanel/EnergyTank");
+        BindUi(ref _produce, "ProducePanel/Produce");
         _waterTank.ViewStartInit();
         _energyTank.ViewStartInit();
+        _produce.ViewStartInit();
+        //获得临时属性格子
         _waterTank.PlaceItemEvent += WaterTankPlaceItemEvent;
         _waterTank.RemoveItemEvent += WaterTankRemoveItemEvent;
 
@@ -193,6 +197,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         BindListener(_increaseTemperature, EventTriggerType.PointerClick, OnIncreaseTemperatureClick);
         BindListener(_reduceTemperature, EventTriggerType.PointerClick, OnReduceTemperatureClick);
         //变量绑定结束
+        AddListenerEvent("InitStorageItem", InitStorageItem);
     }
 
     //变量方法开始
@@ -343,7 +348,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         _currentEnergyValue.text = currentEnergy.ToString();
     }
 
-    [LabelText("获得容器内所有属性")]
+    [LabelText("获得容器内所有属性,0除外")]
     private List<Attribute> GetAllContainerAttribute()
     {
         List<Attribute> attributes = new List<Attribute>();
@@ -357,7 +362,8 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
             foreach (AttributeValue attributeValue in itemSlot.item.attributeValueList)
             {
-                if (!attributes.Contains(attributeValue.attribute))
+                //没有包含当前属性,并且属性有值
+                if (!attributes.Contains(attributeValue.attribute) && attributeValue.value > 0)
                 {
                     attributes.Add(attributeValue.attribute);
                 }
@@ -376,29 +382,334 @@ public class SmallPharmaceuticalApparatus : BaseWindow
             window.transform.position = Input.mousePosition + _moveOffset;
         }
 
-        //当前有能量
-        if (currentEnergy > 0)
+        //没能量,温度
+        if (currentEnergy == 0 && energyCache == 0)
         {
+            currentTemperature = 0;
+            return;
         }
 
         currentCombustionTime += Time.deltaTime;
         if (currentCombustionTime >= combustionInterval)
         {
             currentCombustionTime = 0;
-            AttributeComposition attributeComposition = ListenerComponent.Instance.attributeCompositionSceneComponent.GetQualifiedAttributeComposition(GetAllContainerAttribute(), currentTemperature);
-            if (!attributeCompositionDurationDict.ContainsKey(attributeComposition))
+            //获得所有配方
+            List<AttributeComposition> attributeCompositions = ListenerComponent.Instance.attributeCompositionSceneComponent.GetQualifiedAttributeComposition(GetAllContainerAttribute());
+            foreach (AttributeComposition attributeComposition in attributeCompositions)
             {
-                attributeCompositionDurationDict.Add(attributeComposition, 1);
-            }
-            else
-            {
-                attributeCompositionDurationDict[attributeComposition] += 1;
+                //包含配方全部属性,材料充足
+                if (GetSufficientMaterials(attributeComposition))
+                {
+                    //没有属性添加属性
+                    if (!attributeCompositionDurationDict.ContainsKey(attributeComposition))
+                    {
+                        attributeCompositionDurationDict.Add(attributeComposition, 0);
+                    }
+
+                    //符合合适温度
+                    if (currentTemperature == attributeComposition.requiredTemperature)
+                    {
+                        attributeCompositionDurationDict[attributeComposition] += 1;
+                    }
+                    else
+                    {
+                        //温度不合适,减少
+                        if (attributeCompositionDurationDict[attributeComposition] > 0)
+                        {
+                            attributeCompositionDurationDict[attributeComposition] -= 1;
+                        }
+                    }
+                }
+                else
+                {
+                    if (attributeCompositionDurationDict.ContainsKey(attributeComposition))
+                    {
+                        attributeCompositionDurationDict.Remove(attributeComposition);
+                    }
+                }
+
                 //配方时间到了
                 if (attributeCompositionDurationDict[attributeComposition] >= attributeComposition.requiredTime)
                 {
-                    
+                    RemoveMaterialsGenerateNewAttribute(attributeComposition);
+                    //移除当前配方
+                    if (attributeCompositionDurationDict.ContainsKey(attributeComposition))
+                    {
+                        attributeCompositionDurationDict.Remove(attributeComposition);
+                    }
                 }
             }
         }
+    }
+
+    //当前配方所需的材料是否充足
+    private bool GetSufficientMaterials(AttributeComposition attributeComposition)
+    {
+        bool sufficientMaterials = true;
+        foreach (AttributeCompositionProportion attributeCompositionProportion in attributeComposition.attributeGroup)
+        {
+            //需要的值
+            int needValue = attributeCompositionProportion.value;
+            //当前的值
+            int currentValue = 0;
+            //获得所有物品的属性值
+            foreach (ItemSlot itemSlot in _itemSlotContent)
+            {
+                if (itemSlot.item == null)
+                {
+                    continue;
+                }
+
+                foreach (AttributeValue attributeValue in itemSlot.item.attributeValueList)
+                {
+                    if (attributeValue.attribute.attributeId == attributeCompositionProportion.attribute.attributeId)
+                    {
+                        currentValue += attributeValue.value;
+                    }
+                }
+            }
+
+            //材料不充足
+            if (currentValue < needValue)
+            {
+                sufficientMaterials = false;
+            }
+        }
+
+        return sufficientMaterials;
+    }
+
+    //移除材料并生成新的物体
+    private void RemoveMaterialsGenerateNewAttribute(AttributeComposition attributeComposition)
+    {
+        foreach (AttributeCompositionProportion attributeCompositionProportion in attributeComposition.attributeGroup)
+        {
+            //需要的值
+            int needValue = attributeCompositionProportion.value;
+            //材料充足,移除物品属性,生成新的物品
+            foreach (ItemSlot itemSlot in _itemSlotContent)
+            {
+                //当前物品是否包含当前属性
+                if (itemSlot.item == null)
+                {
+                    continue;
+                }
+
+                foreach (AttributeValue attributeValue in itemSlot.item.attributeValueList)
+                {
+                    //找到属性一样的
+                    if (attributeCompositionProportion.attribute.attributeId == attributeValue.attribute.attributeId)
+                    {
+                        if (needValue <= attributeValue.value)
+                        {
+                            attributeValue.value -= needValue;
+                        }
+                        else
+                        {
+                            needValue -= attributeValue.value;
+                            attributeValue.value = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        //如果没有放置容器,直接丢失
+        if (_produce.item == null)
+        {
+            return;
+        }
+
+        //当前量
+        int currentValue = 0;
+        //算出瓶子还有多少容量
+        int remainingCapacity = 0;
+        //总容量
+        int totalCapacity = 0;
+        foreach (AttributeValue attributeValue in _produce.item.attributeValueList)
+        {
+            //容量属性不能计算
+            if (attributeValue.attribute.GetAttributeType() != typeof(CapacityAttribute))
+            {
+                currentValue += attributeValue.value;
+            }
+            else
+            {
+                totalCapacity += attributeValue.value;
+            }
+        }
+
+        //剩余容量
+        remainingCapacity = totalCapacity - currentValue;
+        //产出量
+        int outputValue = attributeComposition.OutputValue();
+
+        if (outputValue <= remainingCapacity)
+        {
+            _produce.item.AddAttributeValue(new AttributeValue()
+            {
+                attribute = attributeComposition.finalAttribute,
+                value = outputValue
+            });
+        }
+        else
+        {
+            _produce.item.AddAttributeValue(new AttributeValue()
+            {
+                attribute = attributeComposition.finalAttribute,
+                value = remainingCapacity
+            });
+        }
+    }
+
+    private void InitStorageItem()
+    {
+        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataSaveEvent(Save);
+        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataLoadEvent(Load);
+    }
+
+    private void Save()
+    {
+        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = SaveSmallPharmaceuticalApparatusSaveDataGroup(currentWater, incrementWater, waterMax, currentTemperature, temperatureMax, currentEnergy, temperatureConversionRatio, everyTimeBurningMultiple,
+            _energyBurningTimeTask, _energyBurningEndTimeTask, _waterTank, _produce, _energyTank, attributeCompositionDurationDict, combustionInterval, currentCombustionTime, _itemSlotContent);
+        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SaveSmallPharmaceuticalApparatusSaveDataGroup(1, smallPharmaceuticalApparatusSaveDataGroup);
+    }
+
+    private SmallPharmaceuticalApparatusSaveDataGroup SaveSmallPharmaceuticalApparatusSaveDataGroup(int currentWater, int incrementWater, int waterMax, int currentTemperature, int temperatureMax, float currentEnergy, int temperatureConversionRatio, int everyTimeBurningMultiple,
+        int energyBurningTimeTask, int energyBurningEndTimeTask, ItemSlot waterTank, ItemSlot produce, ItemSlot energyTank, Dictionary<AttributeComposition, int> attributeCompositionDurationDict, int combustionInterval, float currentCombustionTime, List<ItemSlot> itemSlot)
+    {
+        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = ScriptableObject.CreateInstance<SmallPharmaceuticalApparatusSaveDataGroup>();
+        smallPharmaceuticalApparatusSaveDataGroup.currentWater = currentWater;
+        smallPharmaceuticalApparatusSaveDataGroup.incrementWater = incrementWater;
+        smallPharmaceuticalApparatusSaveDataGroup.waterMax = waterMax;
+        smallPharmaceuticalApparatusSaveDataGroup.currentTemperature = currentTemperature;
+        smallPharmaceuticalApparatusSaveDataGroup.temperatureMax = temperatureMax;
+        smallPharmaceuticalApparatusSaveDataGroup.currentEnergy = currentEnergy;
+        smallPharmaceuticalApparatusSaveDataGroup.temperatureConversionRatio = temperatureConversionRatio;
+        smallPharmaceuticalApparatusSaveDataGroup.everyTimeBurningMultiple = everyTimeBurningMultiple;
+        smallPharmaceuticalApparatusSaveDataGroup.energyBurningTimeTask = energyBurningTimeTask;
+        smallPharmaceuticalApparatusSaveDataGroup.energyBurningEndTimeTask = energyBurningEndTimeTask;
+        if (waterTank.item == null)
+        {
+            Debug.Log(1);
+            smallPharmaceuticalApparatusSaveDataGroup.waterTank = null;
+        }
+        else
+        {
+            smallPharmaceuticalApparatusSaveDataGroup.waterTank = new ItemSlotSaveData() { itemId = waterTank.item.ItemId, itemSlotIndex = waterTank.itemIndex, attributeValueList = waterTank.item.attributeValueList };
+        }
+
+        if (produce.item == null)
+        {
+            Debug.Log(1);
+
+            smallPharmaceuticalApparatusSaveDataGroup.produce = null;
+        }
+        else
+        {
+            smallPharmaceuticalApparatusSaveDataGroup.produce = new ItemSlotSaveData() { itemId = produce.item.ItemId, itemSlotIndex = produce.itemIndex, attributeValueList = produce.item.attributeValueList };
+        }
+
+        if (energyTank.item == null)
+        {
+            Debug.Log(1);
+
+            smallPharmaceuticalApparatusSaveDataGroup.energyTank = null;
+        }
+        else
+        {
+            smallPharmaceuticalApparatusSaveDataGroup.energyTank = new ItemSlotSaveData() { itemId = energyTank.item.ItemId, itemSlotIndex = energyTank.itemIndex, attributeValueList = energyTank.item.attributeValueList };
+        }
+
+        smallPharmaceuticalApparatusSaveDataGroup.attributeCompositionDurationDict = attributeCompositionDurationDict;
+        smallPharmaceuticalApparatusSaveDataGroup.combustionInterval = combustionInterval;
+        smallPharmaceuticalApparatusSaveDataGroup.currentCombustionTime = currentCombustionTime;
+        smallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData.Clear();
+
+        foreach (ItemSlot slot in itemSlot)
+        {
+            if (slot.item != null)
+            {
+                smallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData.Add(new ItemSlotSaveData()
+                {
+                    itemId = slot.item.ItemId, itemSlotIndex = slot.itemIndex, attributeValueList = slot.item.attributeValueList
+                });
+            }
+        }
+
+        return smallPharmaceuticalApparatusSaveDataGroup;
+    }
+
+
+    private void Load()
+    {
+        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = ListenerComponent.Instance.itemSlotDataSaveSceneComponent.GetSmallPharmaceuticalApparatusSaveDataGroup(1);
+        if (smallPharmaceuticalApparatusSaveDataGroup == null)
+        {
+            return;
+        }
+
+        foreach (ItemSlotSaveData itemSlotSaveData in smallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData)
+        {
+            Item item = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(itemSlotSaveData.itemId);
+            item.attributeValueList = itemSlotSaveData.attributeValueList;
+            AddItem(item, itemSlotSaveData.itemSlotIndex);
+        }
+
+        //水容器
+        if (smallPharmaceuticalApparatusSaveDataGroup.waterTank.itemSlotIndex != -1)
+        {
+            Item waterTankItem = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.waterTank.itemId);
+            waterTankItem.attributeValueList = smallPharmaceuticalApparatusSaveDataGroup.waterTank.attributeValueList;
+            _waterTank.AddItem(waterTankItem);
+        }
+
+        //能量容器
+        if (smallPharmaceuticalApparatusSaveDataGroup.energyTank.itemSlotIndex != -1)
+        {
+            Item energyTankItem = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.energyTank.itemId);
+            energyTankItem.attributeValueList = smallPharmaceuticalApparatusSaveDataGroup.energyTank.attributeValueList;
+            _energyTank.AddItem(energyTankItem);
+        }
+
+        //输出容器
+        if (smallPharmaceuticalApparatusSaveDataGroup.produce.itemSlotIndex != -1)
+        {
+            Item produceItem = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.produce.itemId);
+            produceItem.attributeValueList = smallPharmaceuticalApparatusSaveDataGroup.produce.attributeValueList;
+            _produce.AddItem(produceItem);
+        }
+
+
+        currentWater = smallPharmaceuticalApparatusSaveDataGroup.currentWater;
+        incrementWater = smallPharmaceuticalApparatusSaveDataGroup.incrementWater;
+        waterMax = smallPharmaceuticalApparatusSaveDataGroup.waterMax;
+        temperatureMax = smallPharmaceuticalApparatusSaveDataGroup.temperatureMax;
+        currentEnergy = smallPharmaceuticalApparatusSaveDataGroup.currentEnergy;
+        temperatureConversionRatio = smallPharmaceuticalApparatusSaveDataGroup.temperatureConversionRatio;
+        everyTimeBurningMultiple = smallPharmaceuticalApparatusSaveDataGroup.everyTimeBurningMultiple;
+        _energyBurningTimeTask = smallPharmaceuticalApparatusSaveDataGroup.energyBurningTimeTask;
+        _energyBurningEndTimeTask = smallPharmaceuticalApparatusSaveDataGroup.energyBurningEndTimeTask;
+        attributeCompositionDurationDict = smallPharmaceuticalApparatusSaveDataGroup.attributeCompositionDurationDict;
+        combustionInterval = smallPharmaceuticalApparatusSaveDataGroup.combustionInterval;
+        currentCombustionTime = smallPharmaceuticalApparatusSaveDataGroup.currentCombustionTime;
+        currentTemperature = smallPharmaceuticalApparatusSaveDataGroup.currentTemperature;
+    }
+
+    private bool AddItem(Item item, int itemSlotIndex)
+    {
+        foreach (ItemSlot itemSlot in _itemSlotContent)
+        {
+            if (itemSlot.itemIndex == itemSlotIndex)
+            {
+                if (itemSlot.IsNull())
+                {
+                    itemSlot.AddItem(item);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

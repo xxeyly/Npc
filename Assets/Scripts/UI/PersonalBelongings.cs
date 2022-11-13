@@ -145,7 +145,7 @@ public class PersonalBelongings : BaseWindow
     {
         foreach (ItemSlot itemSlot in _itemSlotContent)
         {
-            if (itemSlot.itemIndex == itemSlotIndex)
+            if (itemSlotIndex != -1 && itemSlot.itemIndex == itemSlotIndex)
             {
                 if (itemSlot.IsNull())
                 {

@@ -10,7 +10,7 @@ public class AttributeCompositionSceneComponent : SceneComponent
 
     public override void StartComponent()
     {
-        AddReturnListenerEvent<List<Attribute>, int, AttributeComposition>("GetQualifiedAttributeComposition", GetQualifiedAttributeComposition);
+        AddReturnListenerEvent<List<Attribute>, List<AttributeComposition>>("GetQualifiedAttributeComposition", GetQualifiedAttributeComposition);
     }
 
     public override void InitComponent()
@@ -22,18 +22,13 @@ public class AttributeCompositionSceneComponent : SceneComponent
     }
 
     [LabelText("获得合格属性组")]
-    private AttributeComposition GetQualifiedAttributeComposition(List<Attribute> attributeGroup, int requiredTemperature)
+    private List<AttributeComposition> GetQualifiedAttributeComposition(List<Attribute> attributeGroup)
     {
+        List<AttributeComposition> attributeCompositions = new List<AttributeComposition>();
         foreach (AttributeComposition attributeComposition in attributeCompositionGroup)
         {
             //当前属性个数小于数值组个数,不计算
             if (attributeGroup.Count < attributeComposition.attributeGroup.Count)
-            {
-                continue;
-            }
-
-            //当前温度不合适,不计算
-            if (requiredTemperature != attributeComposition.requiredTemperature)
             {
                 continue;
             }
@@ -44,10 +39,29 @@ public class AttributeCompositionSceneComponent : SceneComponent
                 continue;
             }
 
-            return attributeComposition;
+            attributeCompositions.Add(attributeComposition);
         }
 
-        return null;
+        attributeCompositions = AttributeCompositionSort(attributeCompositions);
+
+        return attributeCompositions;
+    }
+
+    //排序,大的放前面
+    private List<AttributeComposition> AttributeCompositionSort(List<AttributeComposition> attributeCompositions)
+    {
+        for (int i = 0; i < attributeCompositions.Count; i++)
+        {
+            for (int j = i; j < attributeCompositions.Count; j++)
+            {
+                if (attributeCompositions[i].priority < attributeCompositions[j].priority)
+                {
+                    (attributeCompositions[i], attributeCompositions[j]) = (attributeCompositions[j], attributeCompositions[i]);
+                }
+            }
+        }
+
+        return attributeCompositions;
     }
 
     [LabelText("比较两个属性是否包含")]
