@@ -1,8 +1,8 @@
-//引入开始
+#region 引入
 
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-//引入结束
+#endregion 引入
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -12,7 +12,7 @@ using XFramework;
 
 public class TempDragItemSlot : BaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private GameObject _itemSlot;
     private Image _normal;
     private Image _null;
@@ -20,7 +20,7 @@ public class TempDragItemSlot : BaseWindow
 
     private Image _itemIcon;
 
-    //变量声明结束
+    #endregion 变量声明
     [LabelText("拖拽物品格子")] private Item _dragItem;
     [LabelText("偏移值")] [SerializeField] private Vector2 offsetValue;
     [LabelText("拖拽中")] [SerializeField] private bool drag;
@@ -38,20 +38,20 @@ public class TempDragItemSlot : BaseWindow
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _itemSlot, "ItemSlot");
         BindUi(ref _normal, "ItemSlot/Normal");
         BindUi(ref _null, "ItemSlot/Null");
         BindUi(ref _content, "ItemSlot/Content");
         BindUi(ref _itemIcon, "ItemSlot/ItemIcon");
-        //变量查找结束
+        #endregion 变量查找
     }
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
 
-        //变量绑定结束
+        #endregion 变量绑定
         AddListenerEvent<ItemSlot>("SetDragItemSlot", SetDragItemSlot);
         AddListenerEvent("RemoveDragItemSlot", RemoveDragItemSlot);
         AddListenerEvent<ItemSlot>("SetEnterItemSlot", SetEnterItemSlot);
@@ -61,13 +61,13 @@ public class TempDragItemSlot : BaseWindow
     }
 
 
-    //变量方法开始
+    #region 变量方法
 
-    //变量方法结束
+    #endregion 变量方法
 
-    //自定义属性开始
+    #region 自定义属性
 
-    //自定义属性结束
+    #endregion 自定义属性
 
     protected override void Update()
     {

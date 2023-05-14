@@ -54,4 +54,4 @@ MonoBehaviour:
     - attribute: {fileID: 11400000, guid: 62e473e85984b8142b7b28df24a27bd9, type: 2}
       value: 100
   combustionInterval: 1
-  currentCombustionTime: 0.8267947
+  currentCombustionTime: 0.16702831

@@ -1,8 +1,8 @@
-//引入开始
+#region 引入
 
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-//引入结束
+#endregion 引入
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -14,14 +14,14 @@ public delegate void SelectItemDelegate(Item item);
 
 public class ItemAtlasDisplay : BaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private Button _windowMoveEvent;
     private Button _close;
     private ScrollRect _itemDemand;
 
     private List<ItemAtlasDisplayItem> _itemSlotContent;
 
-    //变量声明结束
+    #endregion 变量声明
     private Transform _itemSlotContentPatient;
     [SerializeField] [LabelText("图鉴预制体")] private GameObject itemAtlasDisplayItemPre;
     [SerializeField] [LabelText("选择物品")] private bool selectItemState;
@@ -33,7 +33,7 @@ public class ItemAtlasDisplay : BaseWindow
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _windowMoveEvent, "Title/WindowMoveEvent");
         BindUi(ref _close, "Title/Close");
         BindUi(ref _itemDemand, "ItemDemand");
@@ -44,17 +44,17 @@ public class ItemAtlasDisplay : BaseWindow
             _itemSlotContent[i].InitData(i);
         }
 
-        //变量查找结束
+        #endregion 变量查找
         BindUi(ref _itemSlotContentPatient, "ItemDemand/Viewport/ItemSlotContent");
     }
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
         BindListener(_windowMoveEvent, EventTriggerType.PointerDown, OnWindowMoveEventDown);
         BindListener(_windowMoveEvent, EventTriggerType.PointerUp, OnWindowMoveEventUp);
         BindListener(_close, EventTriggerType.PointerClick, OnCloseClick);
-        //变量绑定结束
+        #endregion 变量绑定
         AddListenerEvent("InitAtlas", InitAtlas);
         AddListenerEvent<int>("OnEnter", OnEnter);
         AddListenerEvent<SelectItemDelegate>("AddSelectItemDelegate", AddSelectItemDelegate);
@@ -63,7 +63,7 @@ public class ItemAtlasDisplay : BaseWindow
         AddListenerEvent<bool>("SetSelectItemState", SetSelectItemState);
     }
 
-    //变量方法开始
+    #region 变量方法
     private void OnWindowMoveEventDown(BaseEventData targetObj)
     {
     }
@@ -75,11 +75,11 @@ public class ItemAtlasDisplay : BaseWindow
     private void OnCloseClick(BaseEventData targetObj)
     {
     }
-    //变量方法结束
+    #endregion 变量方法
 
-    //自定义属性开始
+    #region 自定义属性
 
-    //自定义属性结束
+    #endregion 自定义属性
 
     private void SetSelectItemState(bool value)
     {

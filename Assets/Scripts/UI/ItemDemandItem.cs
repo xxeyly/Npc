@@ -134,10 +134,18 @@ public class ItemDemandItem : ChildBaseWindow
 
     public void ShowItem(Item item)
     {
+        this.demandItem = item;
         _itemIcon.sprite = item.ItemIcon;
         DisPlayObj(false, _add, _null);
         DisPlayObj(true, _normal, _itemIcon);
         itemDemandItemType = ItemDemandItemType.有;
+    }
+
+    public void SetNull()
+    {
+        itemDemandItemType = ItemDemandItemType.无;
+        DisPlayObj(true, _add, _null);
+        DisPlayObj(false, _normal, _itemIcon);
     }
 
     public override void OnSelect()

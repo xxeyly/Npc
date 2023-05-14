@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1320818517396163721}
   - component: {fileID: 1320818517396163716}
   - component: {fileID: 1320818517396163723}
-  - component: {fileID: 1320818517396163720}
+  - component: {fileID: -4364465656455688426}
   m_Layer: 5
   m_Name: PurchaseItemsRequiredAttributes
   m_TagString: Untagged
@@ -68,89 +68,32 @@ MonoBehaviour:
   - 'using UnityEngine.UI;
 
 '
-  - "using UnityEngine.EventSystems;\r"
+  - "using TMPro;\r"
   allUiVariableName:
-  - '    private Image _normal;
+  - '    private Image _attributesBack;
 
 '
-  - '    private Image _null;
+  - '    private TextMeshProUGUI _attributesName;
 
 '
-  - '    private Image _itemIcon;
+  - '    private TMP_InputField _min;
 
 '
-  - '    private Text _content;
-
-'
-  - '    private Button _event;'
+  - '    private TMP_InputField _max;'
   allUiVariableBind:
-  - '        BindUi(ref _normal,"Normal");
+  - '        BindUi(ref _attributesBack,"AttributesBack");
 
 '
-  - '        BindUi(ref _null,"Null");
+  - '        BindUi(ref _attributesName,"AttributesName");
 
 '
-  - '        BindUi(ref _itemIcon,"ItemIcon");
+  - '        BindUi(ref _min,"Min");
 
 '
-  - '        BindUi(ref _content,"Content");
-
-'
-  - '        BindUi(ref _event,"Event");'
-  allUiVariableBindListener:
-  - '        BindListener(_event,EventTriggerType.PointerClick,OnEventClick);
-
-'
-  - '        BindListener(_event,EventTriggerType.PointerEnter,OnEventEnter);
-
-'
-  - '        BindListener(_event,EventTriggerType.PointerExit,OnEventExit);
-
-'
-  - '        BindListener(_event,EventTriggerType.PointerDown,OnEventDown);
-
-'
-  - '        BindListener(_event,EventTriggerType.PointerUp,OnEventUp);
-
-'
-  - '        BindListener(_event,EventTriggerType.Drag,OnEventDrag);
-
-'
-  - '        BindListener(_event,EventTriggerType.BeginDrag,OnEventBeginDrag);
-
-'
-  - '        BindListener(_event,EventTriggerType.EndDrag,OnEventEndDrag);
-
-'
-  - '        BindListener(_event,EventTriggerType.Scroll,OnEventScroll);'
-  allUiVariableBindListenerEvent:
-  - "    private void OnEventClick(BaseEventData targetObj)\n    {\r\n        if
-    (_drag)\r\n        {\r\n            return;\r\n        }\r\n    }\n"
-  - "    private void OnEventEnter(BaseEventData targetObj)\n    {\r\n        if
-    (ListenerComponent.Instance.tempDragItemSlot.GetDragSate())\r\n        {\r\n           
-    ListenerComponent.Instance.tempDragItemSlot.SetEnterItemSlot(this);\r\n       
-    }\r\n\r\n        ShowItemAttribute();\r\n    }\n"
-  - "    private void OnEventExit(BaseEventData targetObj)\n    {\r\n        if (ListenerComponent.Instance.tempDragItemSlot.GetDragSate())\r\n       
-    {\r\n            ListenerComponent.Instance.tempDragItemSlot.SetEnterItemSlotNull();\r\n       
-    }\r\n\r\n        ListenerComponent.Instance.itemAttributeShow.HideItemAttribute();\r\n   
-    }\n"
-  - "    private void OnEventDown(BaseEventData targetObj)\n    {\r\n        if (item
-    == null)\r\n        {\r\n            return;\r\n        }\r\n\r\n\r\n       
-    ListenerComponent.Instance.personalBelongings.SetDragItemSlot(this);\r\n       
-    item = null;\r\n        UpdateItemUI();\r\n    }\n"
-  - "    private void OnEventUp(BaseEventData targetObj)\n    {\r\n        if (ListenerComponent.Instance.tempDragItemSlot.GetDragSate())\r\n       
-    {\r\n            ListenerComponent.Instance.tempDragItemSlot.RemoveDragItemSlot();\r\n       
-    }\r\n    }\n"
-  - "    private void OnEventDrag(BaseEventData targetObj)\n    {\r\n        // _scrollRect.OnDrag((PointerEventData)targetObj);\r\n   
-    }\n"
-  - "    private void OnEventBeginDrag(BaseEventData targetObj)\n    {\r\n       
-    _drag = true;\r\n        // _scrollRect.OnBeginDrag((PointerEventData)targetObj);\r\n   
-    }\n"
-  - "    private void OnEventEndDrag(BaseEventData targetObj)\n    {\r\n        _drag
-    = false;\r\n        // _scrollRect.OnEndDrag((PointerEventData)targetObj);\r\n   
-    }\n"
-  - "    private void OnEventScroll(BaseEventData targetObj)\n    {\n    }"
---- !u!114 &1320818517396163720
+  - '        BindUi(ref _max,"Max");'
+  allUiVariableBindListener: []
+  allUiVariableBindListenerEvent: []
+--- !u!114 &-4364465656455688426
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,7 +102,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1320818517396163726}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe70fb4e8160a1f4b980363ae5d53b6a, type: 3}
+  m_Script: {fileID: 11500000, guid: b6519e1ad24adec4a9ab2e531307bf38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
@@ -176,15 +119,9 @@ MonoBehaviour:
       Data: 0|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: ItemSlot, Assembly-CSharp
+      Data: PurchaseItemsRequiredAttributes, Assembly-CSharp
     - Name: 
       Entry: 8
-      Data: 
-    - Name: PlaceItemEvent
-      Entry: 6
-      Data: 
-    - Name: RemoveItemEvent
-      Entry: 6
       Data: 
   viewShowType: 0
   showType: 0
@@ -193,12 +130,9 @@ MonoBehaviour:
   isLog: 0
   timeTaskInfoList: []
   viewName: 
-  typeName: ItemSlot
+  typeName: 
   callBackName: []
   itemIndex: 0
-  item: {fileID: 0}
-  restricted: 0
-  restrictedItemList: []
 --- !u!1 &1320818517639931459
 GameObject:
   m_ObjectHideFlags: 0
@@ -574,14 +508,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
+  m_ContentType: 2
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 4
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 0
@@ -636,7 +570,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bc8da753d15c234a86091fcda764e57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 1
+  type: 14
   childType: {fileID: 0}
   eventTriggerType: 0
 --- !u!1 &7055323383475695898
@@ -766,14 +700,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
+  m_ContentType: 2
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 4
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 0
@@ -828,7 +762,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bc8da753d15c234a86091fcda764e57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 1
+  type: 14
   childType: {fileID: 0}
   eventTriggerType: 0
 --- !u!1 &7055323383954291360

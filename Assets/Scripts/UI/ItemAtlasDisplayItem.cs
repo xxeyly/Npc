@@ -1,8 +1,8 @@
-//引入开始
+#region 引入
 
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-//引入结束
+#endregion 引入
 using Sirenix.OdinInspector;
 using UnityEngine;
 using XFramework;
@@ -10,7 +10,7 @@ using XFramework;
 [RequireComponent(typeof(ChildBaseWindowGenerateScripts))]
 public class ItemAtlasDisplayItem : ChildBaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private Image _normal;
     private Image _null;
     private Image _itemIcon;
@@ -20,7 +20,7 @@ public class ItemAtlasDisplayItem : ChildBaseWindow
 
     private Button _event;
 
-    //变量声明结束
+    #endregion 变量声明
     [SerializeField] [LabelText("解锁状态")] public bool lockState;
 
     public override void Init()
@@ -29,7 +29,7 @@ public class ItemAtlasDisplayItem : ChildBaseWindow
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _normal, "Normal");
         BindUi(ref _null, "Null");
         BindUi(ref _itemIcon, "ItemIcon");
@@ -37,20 +37,20 @@ public class ItemAtlasDisplayItem : ChildBaseWindow
         BindUi(ref _select, "Select");
         BindUi(ref _lock, "Lock");
         BindUi(ref _event, "Event");
-        //变量查找结束
+        #endregion 变量查找
     }
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
         BindListener(_event, EventTriggerType.PointerClick, OnEventClick);
         BindListener(_event, EventTriggerType.PointerEnter, OnEventEnter);
         BindListener(_event, EventTriggerType.PointerExit, OnEventExit);
-        //变量绑定结束
+        #endregion 变量绑定
     }
 
 
-    //变量方法开始
+    #region 变量方法
     private void OnEventClick(BaseEventData targetObj)
     {
         if (lockState)
@@ -67,7 +67,7 @@ public class ItemAtlasDisplayItem : ChildBaseWindow
     private void OnEventExit(BaseEventData targetObj)
     {
     }
-    //变量方法结束
+    #endregion 变量方法
 
     public void SetLockState(bool lockState)
     {

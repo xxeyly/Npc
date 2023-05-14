@@ -1,9 +1,9 @@
-//引入开始
+#region 引入
 
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-//引入结束
+#endregion 引入
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -12,7 +12,7 @@ using XFramework;
 [RequireComponent(typeof(ChildBaseWindowGenerateScripts))]
 public class ItemSlot : ChildBaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private Image _normal;
     private Image _null;
     private Image _itemIcon;
@@ -20,7 +20,7 @@ public class ItemSlot : ChildBaseWindow
 
     private Button _event;
 
-    //变量声明结束
+    #endregion 变量声明
     [LabelText("物品属性")] public Item item;
     [LabelText("限制")] public bool restricted;
     [LabelText("限制物品列表")] public List<Item> restrictedItemList = new List<Item>();
@@ -41,18 +41,18 @@ public class ItemSlot : ChildBaseWindow
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _normal, "Normal");
         BindUi(ref _null, "Null");
         BindUi(ref _itemIcon, "ItemIcon");
         BindUi(ref _content, "Content");
         BindUi(ref _event, "Event");
-        //变量查找结束
+        #endregion 变量查找
     }
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
         BindListener(_event, EventTriggerType.PointerClick, OnEventClick);
         BindListener(_event, EventTriggerType.PointerEnter, OnEventEnter);
         BindListener(_event, EventTriggerType.PointerExit, OnEventExit);
@@ -62,11 +62,11 @@ public class ItemSlot : ChildBaseWindow
         BindListener(_event, EventTriggerType.BeginDrag, OnEventBeginDrag);
         BindListener(_event, EventTriggerType.EndDrag, OnEventEndDrag);
         BindListener(_event, EventTriggerType.Scroll, OnEventScroll);
-        //变量绑定结束
+        #endregion 变量绑定
     }
 
 
-    //变量方法开始
+    #region 变量方法
     private void OnEventClick(BaseEventData targetObj)
     {
         if (_drag)
@@ -144,7 +144,7 @@ public class ItemSlot : ChildBaseWindow
         _scrollRect.OnScroll((PointerEventData)targetObj);
     }
 
-    //变量方法结束
+    #endregion 变量方法
     [LabelText("检测物品是否合格")]
     public bool CheckItemQualified(Item item)
     {

@@ -1,9 +1,9 @@
-//引入开始
+#region 引入
 
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
-//引入结束
+#endregion 引入
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -13,7 +13,7 @@ using XFramework;
 
 public class SmallPharmaceuticalApparatus : BaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private Button _windowMoveEvent;
     private Button _close;
     private List<ItemSlot> _itemSlotContent;
@@ -28,7 +28,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     private TextMeshProUGUI _temperatureValue;
 
-    //变量声明结束
+    #endregion 变量声明
     [SerializeField] [LabelText("移动布局")] private bool moveWindow;
     [BoxGroup("水量")] [LabelText("移动偏移")] private Vector3 _moveOffset;
 
@@ -152,7 +152,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _windowMoveEvent, "Title/WindowMoveEvent");
         BindUi(ref _close, "Title/Close");
         BindUi(ref _itemSlotContent, "ItemSlotContent");
@@ -171,7 +171,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         BindUi(ref _increaseTemperature, "TemperaturePanel/IncreaseTemperature");
         BindUi(ref _reduceTemperature, "TemperaturePanel/ReduceTemperature");
         BindUi(ref _temperatureValue, "TemperaturePanel/TemperatureValue");
-        //变量查找结束
+        #endregion 变量查找
         BindUi(ref _waterTank, "WaterPanel/WaterTank");
         BindUi(ref _energyTank, "EnergyPanel/EnergyTank");
         BindUi(ref _produce, "ProducePanel/Produce");
@@ -189,18 +189,18 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
         BindListener(_windowMoveEvent, EventTriggerType.PointerDown, OnWindowMoveEventDown);
         BindListener(_windowMoveEvent, EventTriggerType.PointerUp, OnWindowMoveEventUp);
         BindListener(_close, EventTriggerType.PointerClick, OnCloseClick);
         BindListener(_increaseWater, EventTriggerType.PointerClick, OnIncreaseWaterClick);
         BindListener(_increaseTemperature, EventTriggerType.PointerClick, OnIncreaseTemperatureClick);
         BindListener(_reduceTemperature, EventTriggerType.PointerClick, OnReduceTemperatureClick);
-        //变量绑定结束
+        #endregion 变量绑定
         AddListenerEvent("InitStorageItem", InitStorageItem);
     }
 
-    //变量方法开始
+    #region 变量方法
     private void OnWindowMoveEventDown(BaseEventData targetObj)
     {
         ListenerFrameComponent.Instance.itemAttributeShow.HideItemAttribute();
@@ -315,11 +315,11 @@ public class SmallPharmaceuticalApparatus : BaseWindow
             EnergyReset();
         }
     }
-    //变量方法结束
+    #endregion 变量方法
 
-    //自定义属性开始
+    #region 自定义属性
 
-    //自定义属性结束
+    #endregion 自定义属性
 
     private void WaterTankPlaceItemEvent(Item item)
     {

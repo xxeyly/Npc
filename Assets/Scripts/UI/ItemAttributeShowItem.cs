@@ -1,7 +1,7 @@
-//引入开始
+#region 引入
 
 using UnityEngine.UI;
-//引入结束
+#endregion 引入
 using Sirenix.OdinInspector;
 using UnityEngine;
 using XFramework;
@@ -9,9 +9,9 @@ using XFramework;
 [RequireComponent(typeof(ChildBaseWindowGenerateScripts))]
 public class ItemAttributeShowItem : ChildBaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private Text _content;
-    //变量声明结束
+    #endregion 变量声明
 
     public override void Init()
     {
@@ -19,22 +19,22 @@ public class ItemAttributeShowItem : ChildBaseWindow
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _content, "Content");
-        //变量查找结束
+        #endregion 变量查找
     }
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
 
-        //变量绑定结束
+        #endregion 变量绑定
     }
 
 
-    //变量方法开始
+    #region 变量方法
 
-    //变量方法结束
+    #endregion 变量方法
     public void InitAttribute(Attribute attribute, int attributeValue)
     {
         _content.text = attribute.AttributeName + ":" + attributeValue;

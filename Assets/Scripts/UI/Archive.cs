@@ -1,8 +1,8 @@
-//引入开始
+#region 引入
 
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-//引入结束
+#endregion 引入
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -11,33 +11,33 @@ using XFramework;
 
 public class Archive : BaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private Button _save;
 
     private Button _load;
 
-    //变量声明结束
+    #endregion 变量声明
     public override void Init()
     {
     }
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _save, "Save");
         BindUi(ref _load, "Load");
-        //变量查找结束
+        #endregion 变量查找
     }
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
         BindListener(_save, EventTriggerType.PointerClick, OnSaveClick);
         BindListener(_load, EventTriggerType.PointerClick, OnLoadClick);
-        //变量绑定结束
+        #endregion 变量绑定
     }
 
-    //变量方法开始
+    #region 变量方法
     private void OnSaveClick(BaseEventData targetObj)
     {
         Debug.Log("保存数据");
@@ -49,9 +49,9 @@ public class Archive : BaseWindow
         Debug.Log("读取数据");
         ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.Load();
     }
-    //变量方法结束
+    #endregion 变量方法
 
-    //自定义属性开始
+    #region 自定义属性
 
-    //自定义属性结束
+    #endregion 自定义属性
 }

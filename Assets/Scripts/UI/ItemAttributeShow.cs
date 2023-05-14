@@ -1,8 +1,8 @@
-//引入开始
+#region 引入
 
 using UnityEngine.UI;
 using TMPro;
-//引入结束
+#endregion 引入
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -12,7 +12,7 @@ using XFramework;
 
 public class ItemAttributeShow : BaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private GameObject _attributePanel;
     private Image _itemIcon;
     private TextMeshProUGUI _itemName;
@@ -21,7 +21,7 @@ public class ItemAttributeShow : BaseWindow
 
     private GameObject _itemAttributeShowItemPanel;
 
-    //变量声明结束
+    #endregion 变量声明
     private RectTransform _attributePanelRect;
     private RectTransform _describeRect;
     private RectTransform _attributeTitleRect;
@@ -46,14 +46,14 @@ public class ItemAttributeShow : BaseWindow
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _attributePanel, "AttributePanel");
         BindUi(ref _itemIcon, "AttributePanel/SelectedFrame/ItemIcon");
         BindUi(ref _itemName, "AttributePanel/ItemName");
         BindUi(ref _describe, "AttributePanel/Describe");
         BindUi(ref _attributeTitle, "AttributePanel/AttributeTitle");
         BindUi(ref _itemAttributeShowItemPanel, "AttributePanel/ItemAttributeShowItemPanel");
-        //变量查找结束
+        #endregion 变量查找
         BindUi(ref _itemAttributeShowItemContent, "AttributePanel/ItemAttributeShowItemPanel");
         BindUi(ref _attributePanelRect, "AttributePanel");
         BindUi(ref _describeRect, "AttributePanel/Describe");
@@ -63,21 +63,21 @@ public class ItemAttributeShow : BaseWindow
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
 
-        //变量绑定结束
+        #endregion 变量绑定
         AddListenerEvent<Item, Vector3>("ShowItemAttribute", ShowItemAttribute);
         AddListenerEvent("HideItemAttribute", HideItemAttribute);
         AddListenerEvent<bool>("SetWindowDrag", SetWindowDrag);
     }
 
-    //变量方法开始
+    #region 变量方法
 
-    //变量方法结束
+    #endregion 变量方法
 
-    //自定义属性开始
+    #region 自定义属性
 
-    //自定义属性结束
+    #endregion 自定义属性
     private void SetWindowDrag(bool value)
     {
         _windowDrag = value;

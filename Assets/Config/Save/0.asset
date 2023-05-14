@@ -23,7 +23,7 @@ MonoBehaviour:
     attributeValueList:
     - attribute: {fileID: 11400000, guid: a3e723bc6e646eb4a86aed62a5ab10fb, type: 2}
       value: 200
-  - itemSlotIndex: 22
+  - itemSlotIndex: 2
     itemId: 3
     attributeValueList:
     - attribute: {fileID: 11400000, guid: c03ed93f5ef0f6e40b60c8e44788bdf8, type: 2}

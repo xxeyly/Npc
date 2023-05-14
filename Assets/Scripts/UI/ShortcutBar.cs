@@ -1,6 +1,6 @@
-//引入开始
+#region 引入
 
-//引入结束
+#endregion 引入
 
 using System;
 using System.Collections.Generic;
@@ -10,40 +10,40 @@ using XFramework;
 
 public class ShortcutBar : BaseWindow
 {
-    //变量声明开始
+    #region 变量声明
     private List<ItemSlot> _shortcutBarItermContent;
 
-    //变量声明结束
+    #endregion 变量声明
     public override void Init()
     {
     }
 
     protected override void InitView()
     {
-        //变量查找开始
+       #region 变量查找
         BindUi(ref _shortcutBarItermContent, "ShortcutBarItermContent");
         for (int i = 0; i < _shortcutBarItermContent.Count; i++)
         {
             _shortcutBarItermContent[i].ViewStartInit();
             _shortcutBarItermContent[i].InitData(i);
         }
-        //变量查找结束
+        #endregion 变量查找
     }
 
     protected override void InitListener()
     {
-        //变量绑定开始
+        #region 变量绑定
 
-        //变量绑定结束
+        #endregion 变量绑定
     }
 
-    //变量方法开始
+    #region 变量方法
 
-    //变量方法结束
+    #endregion 变量方法
 
-    //自定义属性开始
+    #region 自定义属性
 
-    //自定义属性结束
+    #endregion 自定义属性
     protected override void Update()
     {
         base.Update();

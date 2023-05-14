@@ -125,6 +125,10 @@ namespace XFramework
             {
                 Instance.ExecuteEvent("PurchaseItems-OnSelect",arg0);
             }
+            public void OnEditorAttributeValue(ItemDemandItem arg0, AttributeValue arg1, Vector2 arg2)
+            {
+                Instance.ExecuteEvent("PurchaseItems-OnEditorAttributeValue",arg0,arg1,arg2);
+            }
         }
         public class SmallPharmaceuticalApparatus
         {
