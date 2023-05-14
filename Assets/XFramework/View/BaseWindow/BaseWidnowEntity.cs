@@ -6,33 +6,6 @@ namespace XFramework
     partial class BaseWindow
     {
         /// <summary>
-        /// 实体组控制
-        /// </summary>
-        /// <param name="groupTag"></param>
-        /// <param name="display"></param>
-        /// <param name="hideOther"></param>
-        protected void DisplayEntityGroup(string groupTag, bool display, bool hideOther = false)
-        {
-            EntityFrameComponent.Instance.DisplayEntityGroup(groupTag, display, hideOther);
-        }
-
-        /// <summary>
-        /// 实体组控制
-        /// </summary>
-        /// <param name="groupTag"></param>
-        /// <param name="display"></param>
-        /// <param name="hideOther"></param>
-        protected void DisplayEntityGroup(bool display, params string[] groupTag)
-        {
-            EntityFrameComponent.Instance.DisplayEntityGroup(display, groupTag);
-        }
-
-        protected List<EntityItem> GetEntityItemByEntityGroupName(string groupName)
-        {
-            return EntityFrameComponent.Instance.GetEntityItemByEntityGroupName(groupName);
-        }
-
-        /// <summary>
         /// 实体全部隐藏
         /// </summary>
         protected void EntityAllHide()
@@ -54,7 +27,7 @@ namespace XFramework
         /// <param name="entityName"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        protected T GetFirstEntityItemByName<T>(string entityName) where T : EntityItem
+        protected T GetFirstEntityItemByName<T>(string entityName)
         {
             return EntityFrameComponent.Instance.GetFirstEntityItemByName<T>(entityName);
         }

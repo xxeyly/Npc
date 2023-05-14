@@ -3,17 +3,18 @@ using UnityEngine;
 
 namespace XFramework
 {
-    public class ControllerCenterRotate : MonoBehaviour
+    public class ControllerCenterRotate : SceneComponent
     {
         [BoxGroup("基础")] [LabelText("开启")] public bool playing = true;
+        [BoxGroup("基础")] [LabelText("开启UI遮挡")] public bool uiOcclusion = true;
         [BoxGroup("基础")] [LabelText("目标物体")] public Transform centerTarget;
         [BoxGroup("基础")] [LabelText("旋转物体")] public Transform rotateTarget;
 
         [BoxGroup("基础")] [LabelText("目标偏移")] public Vector3 targetOffset;
         private float _velocity;
         [LabelText("目标距离")] private float targetDistance;
-        private float x = 0.0f;
-        private float y = 0f;
+        [SerializeField] private float x = 0.0f;
+        [SerializeField] private float y = 0f;
 
         #region 缩放
 
@@ -23,10 +24,12 @@ namespace XFramework
         [BoxGroup("缩放")] [LabelText("最近距离")] public float nearLimit = 0.8f;
         [BoxGroup("缩放")] [LabelText("最远距离")] public float farLimit = 4f;
         float smoothTime = 0.3f;
-#if UNITY_ANDROID
-        private Touch oldTouch1; //上次触摸点1(手指1)  
-        private Touch oldTouch2; //上次触摸点2(手指2) 
-#endif
+
+        [BoxGroup("缩放/触屏")] [SerializeField] [LabelText("上一次第一个触摸点位置")]
+        private Vector2 oldTouch1Pos; //上次触摸点1(手指1)  
+
+        [BoxGroup("缩放/触屏")] [SerializeField] [LabelText("上一次第二个触摸点位置")]
+        private Vector2 oldTouch2Pos; //上次触摸点2(手指2) 
 
         #endregion
 
@@ -34,7 +37,8 @@ namespace XFramework
 
         [BoxGroup("旋转")] [LabelText("是否可旋转")] public bool canManualRotate = true;
         [BoxGroup("旋转")] [LabelText("旋转按键")] public KeyCode rotateCode = KeyCode.Mouse1;
-        [BoxGroup("旋转")] [LabelText("仅水平旋转")] public bool onlyX = false;
+        [BoxGroup("旋转")] [LabelText("开启水平轴向")] public bool isHorizontal = false;
+        [BoxGroup("旋转")] [LabelText("开启垂直轴向")] public bool isVertical = false;
         [BoxGroup("旋转")] [LabelText("水平旋转速度")] public float xSpeed = 250.0f;
         [BoxGroup("旋转")] [LabelText("垂直旋转速度")] public float ySpeed = 120.0f;
 
@@ -78,7 +82,6 @@ namespace XFramework
         [BoxGroup("移动")] [LabelText("Y轴后限制")] public bool selfDownDirectionLimit;
         [BoxGroup("移动")] [LabelText("Z轴前限制")] public bool selfForwardDirectionLimit;
         [BoxGroup("移动")] [LabelText("Z轴后限制")] public bool selfBackDirectionLimit;
-        private Vector3 _limitValue;
         float _yDis, _xDis;
         private bool _firstMove;
         private Vector3 _oldMousePos;
@@ -87,173 +90,202 @@ namespace XFramework
 
         #endregion
 
+        private Vector3 _startPos;
 
-        private void Awake()
+        public void Init(string entityName)
         {
+            centerTarget = GetFirstEntityItemByName<Transform>(entityName);
             Init();
         }
 
-        private Vector3 _startPos;
-
-        public void Init()
+        private void Init()
         {
-            if (centerTarget == null)
-            {
-                centerTarget = Instantiate(new GameObject()).transform;
-            }
-
             targetWorldDefaultPos = centerTarget.position;
             targetSelfDefaultPos = centerTarget.localPosition;
 
             distance = Vector3.Distance(centerTarget.position, rotateTarget.transform.position);
             targetDistance = Vector3.Distance(centerTarget.position, rotateTarget.transform.position);
-            _startPos = DataComponent.GetInspectorEuler(rotateTarget.transform);
-            x = _startPos.y;
-            y = _startPos.x;
+            _startPos = DataFrameComponent.GetInspectorEuler(rotateTarget.transform);
+            // _startPos = rotateTarget.transform.localEulerAngles.y;
+
+            x = rotateTarget.transform.localEulerAngles.y;
+            y = rotateTarget.transform.localEulerAngles.x;
         }
 
-
-        void Update()
+        private void FixedUpdate()
         {
-            if (playing)
+            if (!playing)
             {
-                MouseFunction();
-                x = ClampAngle(x, xMinLimit, xMaxLimit);
-                y = ClampAngle(y, yMinLimit, yMaxLimit);
-                if (canManualRotate)
-                {
-                    Quaternion rotation = Quaternion.Euler(y, x, 0);
+                return;
+            }
 
-                    rotateTarget.transform.rotation = Quaternion.Lerp(rotateTarget.transform.rotation, rotation, Time.deltaTime * 4);
-                    rotateTarget.transform.position =
-                        rotateTarget.transform.rotation * new Vector3(0.0f, 0.0f, -distance) + centerTarget.position + targetOffset;
-                }
+            if (uiOcclusion)
+            {
+                /*if (RuntimeDataFrameComponent.Instance.uiOcclusion)
+                {
+                    return;
+                }*/
+            }
+
+            MouseFunction();
+            // Debug.Log(x);
+            x = ClampAngle(x, xMinLimit, xMaxLimit);
+            y = ClampAngle(y, yMinLimit, yMaxLimit);
+            
+            
+            if (canManualRotate)
+            {
+                Quaternion rotation = Quaternion.Euler(y, x, 0);
+
+                rotateTarget.transform.rotation = Quaternion.Slerp(rotateTarget.transform.rotation, rotation, 0.2f);
+                // transform.localRotation = Quaternion.Euler(x, y, 0.0f);
+
+                // rotateTarget.transform.position = Vector3.Lerp(rotateTarget.transform.position, targetPos, Time.deltaTime * 50);
+            }
+
+            if (canManualZoom)
+            {
+                Vector3 targetPos = rotateTarget.transform.rotation * new Vector3(0, 0, -distance) + centerTarget.position + targetOffset;
+                rotateTarget.transform.position = targetPos;
             }
         }
 
-        #region 鼠标操作
+        public static float DampenFactor(float speed, float elapsed)
+        {
+            if (speed < 0.0f)
+            {
+                return 1.0f;
+            }
+
+#if UNITY_EDITOR
+            if (Application.isPlaying == false)
+            {
+                return 1.0f;
+            }
+#endif
+
+            return 1.0f - Mathf.Pow((float)System.Math.E, -speed * elapsed);
+        }
 
         /// <summary>
         /// 鼠标控制相机
         /// </summary>
         private void MouseFunction()
         {
+            // Debug.Log(Input.touchCount);
             //旋转
-            if (canManualRotate)
+            if (canManualRotate && !Input.GetKey(moveCode))
             {
-#if UNITY_WEBGL || UNITY_EDITOR_WIN
-                if (Input.GetKey(rotateCode))
-                {
-                    Debug.Log("鼠标操作");
-                    x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
+                #region 鼠标键盘
 
-                    if (onlyX == false)
+                if (Input.GetKey(rotateCode) && Input.touchCount == 0)
+                {
+                    // Debug.Log("旋转");
+                    // Debug.Log(Input.GetAxis("Mouse X"));
+
+                    if (isHorizontal)
                     {
-                        y -= Input.GetAxis("Mouse Y") * xSpeed * 0.02f;
+                        if (Mathf.Abs(Input.GetAxis("Mouse X")) > 0.1f)
+                        {
+                            x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
+                        }
+                    }
+
+                    if (isVertical)
+                    {
+                        if (Mathf.Abs(Input.GetAxis("Mouse Y")) > 0.1f)
+                        {
+                            y -= Input.GetAxis("Mouse Y") * xSpeed * 0.02f;
+                        }
                     }
                 }
-#elif UNITY_ANDROID
 
                 if (Input.touchCount == 1)
                 {
-                    Debug.Log("手指操作");
-                    x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
+                    Touch touch = Input.GetTouch(0);
+                    Vector2 deltaPos = touch.deltaPosition;
+                    // Debug.Log("手指操作" + deltaPos.x + ":" + deltaPos.y);
+                    // Debug.Log(Input.GetAxis("Mouse X"));
 
-                    if (onlyX == false)
+                    if (isHorizontal)
                     {
-                        y -= Input.GetAxis("Mouse Y") * xSpeed * 0.02f;
+                        float rotateValue = -deltaPos.x * xSpeed * 0.1f;
+                        float factor = DampenFactor(1, Time.deltaTime);
+                        x = Mathf.Lerp(x, x - rotateValue, factor);
+                        // x -= rotateValue;
                     }
 
-                    Debug.Log(x);
-                    Debug.Log(y);
+                    if (isVertical)
+                    {
+                        y -= deltaPos.y * xSpeed * 0.001f;
+                    }
                 }
-                else
-                {
-                    
-                }
-#endif
+
+                #endregion
             }
 
-
-            if (Input.GetKey(moveCode) && canManualMove)
+            //移动
+            if (canManualMove)
             {
-                _limitValue = centerTarget.localPosition;
-                _currentMousePos = Input.mousePosition;
-                if (!_firstMove)
+                //双指会触发移动操作,这里要进行屏蔽
+                if ((Input.GetKey(moveCode) && Input.touchCount == 0) || Input.touchCount == 3)
                 {
-                    _oldMousePos = _currentMousePos;
-                    _firstMove = true;
-                    return;
-                }
-
-                if (_oldMousePos != _currentMousePos)
-                {
-                    _yDis = (_currentMousePos.y - _oldMousePos.y) * movSpeed;
-                    _xDis = (_currentMousePos.x - _oldMousePos.x) * movSpeed;
-                    _oldMousePos = _currentMousePos;
-                    Vector3 cameraValue = DataComponent.GetInspectorEuler(rotateTarget.transform);
-                    Quaternion rot = Quaternion.Euler(cameraValue.x, cameraValue.y, 0);
-                    if (moveReversal)
+                    // Debug.Log("移动");
+                    _currentMousePos = Input.mousePosition;
+                    if (!_firstMove)
                     {
-                        _xDis = -_xDis;
-                        _yDis = -_yDis;
+                        _oldMousePos = _currentMousePos;
+                        _firstMove = true;
+                        return;
                     }
 
-                    //目标世界坐标
-                    Vector3 targetWorldPos = rot * new Vector3(_xDis, _yDis, 0) + centerTarget.position;
-                    //目标局部坐标
-                    Vector3 targetSelfPos;
-                    //不包含父物体
-                    if (centerTarget.parent == null)
+                    if (_oldMousePos != _currentMousePos)
                     {
-                        //世界坐标等于局部坐标
-                        targetSelfPos = targetWorldPos;
+                        _yDis = (_currentMousePos.y - _oldMousePos.y) * movSpeed;
+                        _xDis = (_currentMousePos.x - _oldMousePos.x) * movSpeed;
+                        _oldMousePos = _currentMousePos;
+                        Vector3 cameraValue = DataFrameComponent.GetInspectorEuler(rotateTarget.transform);
+                        Quaternion rot = Quaternion.Euler(cameraValue.x, cameraValue.y, 0);
+                        if (moveReversal)
+                        {
+                            _xDis = -_xDis;
+                            _yDis = -_yDis;
+                        }
+
+                        //目标世界坐标
+                        Vector3 targetWorldPos = rot * new Vector3(_xDis, _yDis, 0) + centerTarget.position;
+                        //目标局部坐标
+                        Vector3 targetSelfPos;
+                        //不包含父物体
+                        if (centerTarget.parent == null)
+                        {
+                            //世界坐标等于局部坐标
+                            targetSelfPos = targetWorldPos;
+                        }
+                        else
+                        {
+                            //将世界坐标转换局部坐标
+                            targetSelfPos = centerTarget.parent.InverseTransformPoint(targetWorldPos);
+                        }
+
+                        // targetSelfPos = new Vector3(-targetSelfPos.x, targetSelfPos.y, targetSelfPos.z);
+                        //局部坐标增加限制
+                        targetSelfPos = LimitTargetPos(targetSelfPos);
+                        centerTarget.localPosition = targetSelfPos;
+                        movingIncrement = targetSelfPos - _oldTargetPos;
+                        _oldTargetPos = targetSelfPos;
+                        targetOffset = targetSelfPos;
                     }
                     else
                     {
-                        //将世界坐标转换局部坐标
-                        targetSelfPos = centerTarget.parent.InverseTransformPoint(targetWorldPos);
+                        movingIncrement = Vector3.zero;
                     }
-
-                    //局部坐标增加限制
-                    targetSelfPos = LimitTargetPos(targetSelfPos);
-                    if (targetSelfPos.x < _limitValue.x && selfRightDirectionLimit)
-                    {
-                        targetSelfPos = new Vector3(_limitValue.x, targetSelfPos.y, targetSelfPos.z);
-                    }
-
-                    if (targetSelfPos.x > _limitValue.x && selfLeftDirectionLimit)
-                    {
-                        targetSelfPos = new Vector3(_limitValue.x, targetSelfPos.y, targetSelfPos.z);
-                    }
-
-                    if (targetSelfPos.y < _limitValue.y && selfDownDirectionLimit)
-                    {
-                        targetSelfPos = new Vector3(targetSelfPos.x, _limitValue.y, targetSelfPos.z);
-                    }
-
-                    if (targetSelfPos.y > _limitValue.y && selfUpDirectionLimit)
-                    {
-                        targetSelfPos = new Vector3(targetSelfPos.x, _limitValue.y, targetSelfPos.z);
-                    }
-
-                    if (targetSelfPos.z < _limitValue.z && selfBackDirectionLimit)
-                    {
-                        targetSelfPos = new Vector3(targetSelfPos.x, targetSelfPos.y, _limitValue.z);
-                    }
-
-                    if (targetSelfPos.z > _limitValue.z && selfForwardDirectionLimit)
-                    {
-                        targetSelfPos = new Vector3(targetSelfPos.x, targetSelfPos.y, _limitValue.z);
-                    }
-
-                    centerTarget.localPosition = targetSelfPos;
-                    movingIncrement = targetSelfPos - _oldTargetPos;
-                    _oldTargetPos = targetSelfPos;
                 }
                 else
                 {
-                    movingIncrement = Vector3.zero;
+                    //位置修正
+                    // Init();
+                    _oldMousePos = Input.mousePosition;
                 }
             }
             else
@@ -265,49 +297,53 @@ namespace XFramework
                 _currentMousePos = Vector3.zero;
                 _oldMousePos = Vector3.zero;
             }
-#if UNITY_WEBGL || UNITY_EDITOR_WIN
-            //镜头远近
-            if (Input.GetAxis("Mouse ScrollWheel") != 0)
-            {
-                Debug.Log("鼠标缩放");
-                targetDistance -= Input.GetAxis("Mouse ScrollWheel") * movSpeedScroll;
-                targetDistance = Mathf.Clamp(targetDistance, nearLimit, farLimit);
-            }
 
-#elif UNITY_ANDROID
-            if (Input.touchCount == 2)
-            {
-                Debug.Log("手指缩放");
-                //多点触摸, 放大缩小  
-                Touch newTouch1 = Input.GetTouch(0);
-                Touch newTouch2 = Input.GetTouch(1);
-
-                //第2点刚开始接触屏幕, 只记录，不做处理  
-                if (newTouch2.phase == TouchPhase.Began)
-                {
-                    oldTouch2 = newTouch2;
-                    oldTouch1 = newTouch1;
-                    return;
-                }
-
-                //计算老的两点距离和新的两点间距离，变大要放大模型，变小要缩放模型  
-                float oldDistance = Vector2.Distance(oldTouch1.position, oldTouch2.position);
-                float newDistance = Vector2.Distance(newTouch1.position, newTouch2.position);
-
-                //两个距离之差，为正表示放大手势， 为负表示缩小手势  
-                float offset = newDistance - oldDistance;
-                targetDistance -= offset * movSpeedScroll;
-                targetDistance = Mathf.Clamp(targetDistance, nearLimit, farLimit);
-            }
-#endif
+            //缩放
             if (canManualZoom)
             {
+                //鼠标
+                if (Input.touchCount == 0 && Input.GetAxis("Mouse ScrollWheel") != 0)
+                {
+                    targetDistance -= Input.GetAxis("Mouse ScrollWheel") * movSpeedScroll;
+                    targetDistance = Mathf.Clamp(targetDistance, nearLimit, farLimit);
+                }
+
+                //触屏
+                if (Input.touchCount == 2)
+                {
+                    //多点触摸, 放大缩小  
+                    Touch newTouch1 = Input.GetTouch(0);
+                    Touch newTouch2 = Input.GetTouch(1);
+
+                    //第2点刚开始接触屏幕, 只记录，不做处理  
+                    if (newTouch2.phase == TouchPhase.Began)
+                    {
+                        oldTouch1Pos = newTouch1.position;
+                        oldTouch2Pos = newTouch2.position;
+                        return;
+                    }
+
+                    //计算老的两点距离和新的两点间距离，变大要放大模型，变小要缩放模型  
+                    float oldDistance = Vector2.Distance(oldTouch1Pos, oldTouch2Pos);
+                    float newDistance = Vector2.Distance(newTouch1.position, newTouch2.position);
+                    float offset = 0;
+                    //两手指之间距离过小不进行操作
+                    if (newDistance > 150)
+                    {
+                        offset = (newDistance - oldDistance) * movSpeedScroll * 0.01f;
+                    }
+
+                    //两个距离之差，为正表示放大手势， 为负表示缩小手势  
+                    targetDistance -= offset;
+                    targetDistance = Mathf.Clamp(targetDistance, nearLimit, farLimit);
+                    oldTouch1Pos = newTouch1.position;
+                    oldTouch2Pos = newTouch2.position;
+                }
+
                 distance = Mathf.SmoothDamp(distance, targetDistance, ref _velocity, smoothTime);
                 distance = Mathf.Clamp(distance, nearLimit, farLimit);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// 限定角度
@@ -316,7 +352,7 @@ namespace XFramework
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static float ClampAngle(float angle, float min, float max)
+        private static float ClampAngle(float angle, float min, float max)
         {
             if (angle < -360)
                 angle += 360;
@@ -353,6 +389,14 @@ namespace XFramework
         public void Stop()
         {
             playing = false;
+        }
+
+        public override void StartComponent()
+        {
+        }
+
+        public override void EndComponent()
+        {
         }
     }
 }

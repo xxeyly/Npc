@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using LitJson;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,25 +13,137 @@ namespace XFramework
         public static GameRootStart Instance;
 #pragma warning disable 649
         [LabelText("框架组件")] [Searchable] public List<FrameComponent> frameComponent = new List<FrameComponent>();
-        [LabelText("场景组件")] [Searchable] public List<SceneComponent> sceneStartSingletons = new List<SceneComponent>();
-        [LabelText("场景初始化组件")] [Searchable] public List<SceneComponentInit> sceneInitStartSingletons = new List<SceneComponentInit>();
+        [BoxGroup("场景加载")] [LabelText("跳转场景")] public bool initJump;
+
+        [BoxGroup("场景加载")] [LabelText("初始化跳转场景名称")]
+        public string initJumpSceneName;
+
+        [BoxGroup("场景加载")] [LabelText("加载场景")] public Scene loadScene;
+
+        [BoxGroup("框架场景组件")] [LabelText("框架场景组件-不摧毁")] [Searchable]
+        public List<SceneComponent> frameSceneComponents = new List<SceneComponent>();
+
+        [BoxGroup("框架场景组件")] [LabelText("框架场景初始化组件-不摧毁")] [Searchable]
+        public List<SceneComponentInit> frameSceneInitStartSingletons = new List<SceneComponentInit>();
+
+        [BoxGroup("实时场景组件")] [LabelText("场景组件")] [Searchable]
+        public List<SceneComponent> sceneComponents = new List<SceneComponent>();
+
+        [BoxGroup("实时场景组件")] [LabelText("场景初始化组件")] [Searchable]
+        public List<SceneComponentInit> sceneInitStartSingletons = new List<SceneComponentInit>();
+
+        [LabelText("热更加载")] [BoxGroup] public bool hotFixLoad;
         [LabelText("禁止摧毁")] [BoxGroup] public bool dontDestroyOnLoad;
+
+        [LabelText("热修复包AssetBundle配置")] public List<HotFixAssetAssetBundleSceneConfig> hotFixAssetAssetBundleSceneConfigs = new List<HotFixAssetAssetBundleSceneConfig>();
+        [LabelText("框架加载日志")] [BoxGroup] public bool frameLoadLog;
+
+        private List<AssetBundle> _currentSceneAllAssetBundle = new List<AssetBundle>();
+
 
         private void OnEnable()
         {
-            //如果场景中有GameRoot,摧毁当前物体
-            if (FindObjectOfType<GameRoot>())
+            //场景中只有一个GameRootStart
+            if (DataFrameComponent.GetAllObjectsInScene<GameRootStart>().Count == 1)
             {
-                Destroy(gameObject);
+                if (DataFrameComponent.GetAllObjectsInScene<GameRootStart>()[0].dontDestroyOnLoad)
+                {
+                    return;
+                }
             }
+            //多余GameRootStart销毁
             else
             {
-                DontDestroyOnLoad(this);
-                Instance = GetComponent<GameRootStart>();
-                FrameComponentStart();
-                SceneManager.sceneLoaded += SceneLoadOverCallBack;
-                dontDestroyOnLoad = true;
-                //框架组件开启
+                foreach (GameRootStart gameRootStart in DataFrameComponent.GetAllObjectsInScene<GameRootStart>())
+                {
+                    if (!gameRootStart.dontDestroyOnLoad)
+                    {
+                        DestroyImmediate(gameRootStart.gameObject);
+                    }
+                }
+
+                return;
+            }
+
+            DontDestroyOnLoad(this);
+            Instance = GetComponent<GameRootStart>();
+            List<FrameComponent> frameComponents = DataFrameComponent.GetAllObjectsInScene<FrameComponent>();
+            foreach (Type type in General.frameComponentType)
+            {
+                foreach (FrameComponent component in frameComponents)
+                {
+                    if (component.GetType() == type)
+                    {
+                        frameComponent.Add(component);
+                        break;
+                    }
+                }
+            }
+
+            if (hotFixLoad)
+            {
+                string hotFixAssetConfig = FileOperation.GetTextToLoad(Application.streamingAssetsPath, "HotFixAssetConfig.json");
+                hotFixAssetAssetBundleSceneConfigs = JsonMapper.ToObject<List<HotFixAssetAssetBundleSceneConfig>>(hotFixAssetConfig);
+            }
+
+            Debug.Log("框架初始化");
+            FrameComponentStart();
+            FrameComponentSceneInit();
+            Debug.Log("框架初始化完毕");
+            dontDestroyOnLoad = true;
+            //框架组件开启
+
+            frameSceneComponents = new List<SceneComponent>(GetComponentsInChildren<SceneComponent>());
+            for (int i = 0; i < frameSceneComponents.Count; i++)
+            {
+                if (!sceneComponents.Contains(frameSceneComponents[i]))
+                {
+                    if (frameLoadLog)
+                    {
+                        Debug.Log("框架SceneComponent:" + frameSceneComponents[i].GetType());
+                    }
+
+                    frameSceneComponents[i].StartComponent();
+                }
+            }
+
+            frameSceneInitStartSingletons = new List<SceneComponentInit>(GetComponentsInChildren<SceneComponentInit>());
+            for (int i = 0; i < frameSceneInitStartSingletons.Count; i++)
+            {
+                if (!sceneInitStartSingletons.Contains(frameSceneInitStartSingletons[i]))
+                {
+                    if (frameLoadLog)
+                    {
+                        Debug.Log("框架SceneComponentInit:" + frameSceneInitStartSingletons[i].GetType());
+                    }
+
+                    frameSceneInitStartSingletons[i].InitComponent();
+                }
+            }
+
+            if (initJump)
+            {
+                Debug.Log("初始场景跳转");
+                SceneLoadFrameComponent.Instance.SceneLoad(initJumpSceneName, LoadSceneMode.Additive);
+                Destroy(GetComponent<AudioListener>());
+            }
+
+            SceneManager.sceneLoaded += SceneLoadOverCallBack;
+        }
+
+        public void SceneAssetBundleUnload()
+        {
+            if (!hotFixLoad)
+            {
+                return;
+            }
+
+            foreach (AssetBundle assetBundle in _currentSceneAllAssetBundle)
+            {
+                if (assetBundle != null)
+                {
+                    assetBundle.Unload(false);
+                }
             }
         }
 
@@ -40,19 +154,116 @@ namespace XFramework
         /// <param name="sceneType"></param>
         private void SceneLoadOverCallBack(Scene scene, LoadSceneMode sceneType)
         {
-            InitSceneStartSingletons();
+            SceneLoadFrameComponent.Instance.sceneName = scene.name;
+            loadScene = scene;
+            InitSceneStartSingletons(scene);
         }
 
         /// <summary>
         /// 加载场景初始化单例
-        /// 加载顺序 场景组件-场景工具-View静态界面
+        /// 加载顺序 框架组件-场景工具
         /// </summary>
-        private void InitSceneStartSingletons()
+        private void InitSceneStartSingletons(Scene scene)
         {
+            InstantiateHotFixAssetBundle();
+            Debug.Log(scene.name + "场景加载完毕");
             FrameComponentSceneInit();
-            SceneComponentStart();
-            SceneComponentInitStart();
-            Debug.Log(SceneManager.GetActiveScene().name + ":" + "场景初始化完毕");
+            Debug.Log(scene.name + "框架场景初始化");
+            SceneComponentStart(scene);
+            SceneComponentInitStart(scene);
+            Debug.Log(scene.name + ":" + "场景初始化完毕");
+        }
+
+        #region 热更
+
+        private void InstantiateHotFixAssetBundle()
+        {
+            if (!Instance.hotFixLoad)
+            {
+                return;
+            }
+
+            //获得指定场景内容
+            HotFixAssetAssetBundleSceneConfig currentSceneHotFixAssetAssetBundleSceneConfig = null;
+            foreach (HotFixAssetAssetBundleSceneConfig hotFixAssetAssetBundleSceneConfig in hotFixAssetAssetBundleSceneConfigs)
+            {
+                if (hotFixAssetAssetBundleSceneConfig.sceneHotFixAssetAssetBundleAssetConfig.assetBundleName == DataFrameComponent.AllCharToLower(SceneLoadFrameComponent.Instance.sceneName))
+                {
+                    currentSceneHotFixAssetAssetBundleSceneConfig = hotFixAssetAssetBundleSceneConfig;
+                    break;
+                }
+            }
+            //加载内容
+
+            for (int i = 0; i < currentSceneHotFixAssetAssetBundleSceneConfig.assetBundleHotFixAssetAssetBundleAssetConfigs.Count; i++)
+            {
+                AssetBundle tempHotFixAssetBundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/" + currentSceneHotFixAssetAssetBundleSceneConfig.assetBundleHotFixAssetAssetBundleAssetConfigs[i].assetBundlePath);
+                _currentSceneAllAssetBundle.Add(tempHotFixAssetBundle);
+                GameObject hotFixObject = tempHotFixAssetBundle.LoadAsset<GameObject>(currentSceneHotFixAssetAssetBundleSceneConfig.assetBundleHotFixAssetAssetBundleAssetConfigs[i].assetBundleName);
+                switch (currentSceneHotFixAssetAssetBundleSceneConfig.assetBundleHotFixAssetAssetBundleAssetConfigs[i].assetBundleType)
+                {
+                    case HotFixAssetType.UI:
+                        Instantiate(hotFixObject, GameObject.Find(currentSceneHotFixAssetAssetBundleSceneConfig.assetBundleHotFixAssetAssetBundleAssetConfigs[i].assetBundleInstantiatePath).transform, false);
+                        break;
+                    case HotFixAssetType.Scene:
+                        break;
+                    case HotFixAssetType.Env:
+                    case HotFixAssetType.Entity:
+                        if (currentSceneHotFixAssetAssetBundleSceneConfig.assetBundleHotFixAssetAssetBundleAssetConfigs[i].assetBundleInstantiatePath == string.Empty)
+                        {
+                            Instantiate(hotFixObject, null, false);
+                        }
+                        else
+                        {
+                            Instantiate(hotFixObject, GameObject.Find(currentSceneHotFixAssetAssetBundleSceneConfig.assetBundleHotFixAssetAssetBundleAssetConfigs[i].assetBundleInstantiatePath).transform, false);
+                        }
+
+                        break;
+                    case HotFixAssetType.SceneComponent:
+                        Instantiate(hotFixObject, null, false);
+                        break;
+                    case HotFixAssetType.SceneComponentInit:
+                        Instantiate(hotFixObject, null, false);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        #endregion
+
+        //场景加载前准备
+        public void SceneBeforeLoadPrepare(string destroySceneName)
+        {
+            //视图摧毁
+            ViewFrameComponent.Instance.AllViewDestroy(destroySceneName);
+            //计时器初始化
+            TimeFrameComponent.Instance.FrameSceneInitComponent();
+            //实体清除
+            EntityFrameComponent.Instance.RemoveSceneEntityName();
+            //场景组件移除
+            List<SceneComponent> tempSceneComponent = DataFrameComponent.GetAllObjectsInScene<SceneComponent>(destroySceneName);
+            foreach (SceneComponent sceneComponent in tempSceneComponent)
+            {
+                if (sceneComponents.Contains(sceneComponent))
+                {
+                    sceneComponent.RemoveAllListenerEvent();
+                    sceneComponent.EndComponent();
+                    sceneComponents.Remove(sceneComponent);
+                }
+            }
+
+            //场景初始化组件移除
+            List<SceneComponentInit> tempSceneComponentInit = DataFrameComponent.GetAllObjectsInScene<SceneComponentInit>(destroySceneName);
+            foreach (SceneComponentInit sceneComponentInit in tempSceneComponentInit)
+            {
+                if (sceneInitStartSingletons.Contains(sceneComponentInit))
+                {
+                    sceneComponentInit.RemoveAllListenerEvent();
+                    sceneInitStartSingletons.Remove(sceneComponentInit);
+                }
+            }
         }
 
 
@@ -89,32 +300,43 @@ namespace XFramework
         }
 
         [LabelText("开启场景组件")]
-        private void SceneComponentStart()
+        private void SceneComponentStart(Scene scene)
         {
-            sceneStartSingletons = DataComponent.GetAllObjectsInScene<SceneComponent>();
-            for (int i = 0; i < sceneStartSingletons.Count; i++)
+            List<SceneComponent> tempSceneComponent = DataFrameComponent.GetAllObjectsInScene<SceneComponent>(scene.name);
+            for (int i = 0; i < tempSceneComponent.Count; i++)
             {
-                sceneStartSingletons[i].StartComponent();
+                if (!sceneComponents.Contains(tempSceneComponent[i]))
+                {
+                    // Debug.Log(tempSceneComponent[i].GetType());
+                    sceneComponents.Add(tempSceneComponent[i]);
+                    tempSceneComponent[i].StartComponent();
+                }
             }
         }
 
         [LabelText("开启场景初始化组件")]
-        private void SceneComponentInitStart()
+        private void SceneComponentInitStart(Scene scene)
         {
-            sceneInitStartSingletons = DataComponent.GetAllObjectsInScene<SceneComponentInit>();
-            for (int i = 0; i < sceneInitStartSingletons.Count; i++)
+            List<SceneComponentInit> tempSceneComponentInit = DataFrameComponent.GetAllObjectsInScene<SceneComponentInit>(scene.name);
+            for (int i = 0; i < tempSceneComponentInit.Count; i++)
             {
-                sceneInitStartSingletons[i].InitComponent();
+                if (!sceneInitStartSingletons.Contains(tempSceneComponentInit[i]))
+                {
+                    // Debug.Log(tempSceneComponentInit[i].GetType());
+                    sceneInitStartSingletons.Add(tempSceneComponentInit[i]);
+                    tempSceneComponentInit[i].InitComponent();
+                }
             }
         }
 
         //场景组件结束
         [LabelText("结束场景组件")]
-        public void SceneComponentEnd()
+        private void SceneComponentEnd()
         {
-            for (int i = 0; i < sceneStartSingletons.Count; i++)
+            List<SceneComponent> tempSceneComponent = DataFrameComponent.GetAllObjectsInScene<SceneComponent>();
+            for (int i = 0; i < tempSceneComponent.Count; i++)
             {
-                sceneStartSingletons[i].EndComponent();
+                tempSceneComponent[i].EndComponent();
             }
         }
     }

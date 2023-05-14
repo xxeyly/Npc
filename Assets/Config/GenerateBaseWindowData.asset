@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 676c0adeaab748d3ab2647d84ff034ae, type: 3}
+  m_Name: GenerateBaseWindowData
+  m_EditorClassIdentifier: 
+  startUsing: "#region \u5F15\u5165"
+  endUsing: "#endregion \u5F15\u5165"
+  startUiVariable: "#region \u53D8\u91CF\u58F0\u660E"
+  endUiVariable: "#endregion \u53D8\u91CF\u58F0\u660E"
+  startVariableBindPath: "#region \u53D8\u91CF\u67E5\u627E"
+  endVariableBindPath: "#endregion \u53D8\u91CF\u67E5\u627E"
+  startVariableBindListener: "#region \u53D8\u91CF\u7ED1\u5B9A"
+  endVariableBindListener: "#endregion \u53D8\u91CF\u7ED1\u5B9A"
+  startVariableBindEvent: "#region \u53D8\u91CF\u65B9\u6CD5"
+  endVariableBindEvent: "#endregion \u53D8\u91CF\u65B9\u6CD5"
+  startCustomAttributesStart: "#region \u81EA\u5B9A\u4E49\u5C5E\u6027"
+  endCustomAttributesStart: "#endregion \u81EA\u5B9A\u4E49\u5C5E\u6027"

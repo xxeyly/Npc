@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
@@ -20,12 +21,31 @@ namespace XFramework
     /// </summary>
     public abstract class AnimatorControllerBase : MonoBehaviour
     {
+        [BoxGroup("初始化")] [SerializeField] [LabelText("视图是否初始化")]
+        public bool isInit = false;
+
         private Animator _animator;
         [LabelText("动画属性")] [SerializeField] private List<string> animatorControllerParameterName;
-        private List<AnimatorControllerParameter> _allParameter;
+        [SerializeField] private List<AnimatorControllerParameter> _allParameter = new List<AnimatorControllerParameter>();
         [LabelText("动画初始化")] public bool isLoadParameter;
 
-        public virtual void StartComponent()
+
+        public void AddToAnimatorControllerList()
+        {
+            if (AnimatorControllerManager.Instance != null)
+            {
+                if (!AnimatorControllerManager.Instance.allAnimController.Contains(this))
+                {
+                    AnimatorControllerManager.Instance.allAnimController.Add(this);
+                    if (!isInit)
+                    {
+                        Init();
+                    }
+                }
+            }
+        }
+
+        public void Init()
         {
             _animator = GetComponent<Animator>();
             animatorControllerParameterName = new List<string>();
@@ -39,6 +59,8 @@ namespace XFramework
 
                 isLoadParameter = true;
             }
+
+            isInit = true;
         }
 
         private bool ContainsParameter(string parameterName)
@@ -115,7 +137,6 @@ namespace XFramework
                 }
                 else if (animSpeedProgress == AnimSpeedProgress.Start)
                 {
-                    Debug.Log(animationType);
                     _animator.Play(animationType, 0, normalizedTime: 0f);
                 }
             }
@@ -132,7 +153,12 @@ namespace XFramework
         {
             if (ContainsParameter(animationType))
             {
+                PlayAnim(animationType);
                 return _playAnimTimeTask = TimeFrameComponent.Instance.AddTimeTask(eventAction, "播放动画:" + animationType, GetPlayAnimLength(animationType));
+            }
+            else
+            {
+                Debug.Log("不包含当前动画:" + animationType);
             }
 
             return 0;

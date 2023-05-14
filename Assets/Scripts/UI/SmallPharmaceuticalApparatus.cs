@@ -203,8 +203,8 @@ public class SmallPharmaceuticalApparatus : BaseWindow
     //变量方法开始
     private void OnWindowMoveEventDown(BaseEventData targetObj)
     {
-        ListenerComponent.Instance.itemAttributeShow.HideItemAttribute();
-        ListenerComponent.Instance.itemAttributeShow.SetWindowDrag(true);
+        ListenerFrameComponent.Instance.itemAttributeShow.HideItemAttribute();
+        ListenerFrameComponent.Instance.itemAttributeShow.SetWindowDrag(true);
 
         _moveOffset = window.transform.position - Input.mousePosition;
         moveWindow = true;
@@ -212,7 +212,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     private void OnWindowMoveEventUp(BaseEventData targetObj)
     {
-        ListenerComponent.Instance.itemAttributeShow.SetWindowDrag(false);
+        ListenerFrameComponent.Instance.itemAttributeShow.SetWindowDrag(false);
 
         moveWindow = false;
     }
@@ -394,7 +394,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         {
             currentCombustionTime = 0;
             //获得所有配方
-            List<AttributeComposition> attributeCompositions = ListenerComponent.Instance.attributeCompositionSceneComponent.GetQualifiedAttributeComposition(GetAllContainerAttribute());
+            List<AttributeComposition> attributeCompositions = ListenerFrameComponent.Instance.attributeCompositionSceneComponent.GetQualifiedAttributeComposition(GetAllContainerAttribute());
             foreach (AttributeComposition attributeComposition in attributeCompositions)
             {
                 //包含配方全部属性,材料充足
@@ -564,15 +564,15 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     private void InitStorageItem()
     {
-        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataSaveEvent(Save);
-        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataLoadEvent(Load);
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataSaveEvent(Save);
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataLoadEvent(Load);
     }
 
     private void Save()
     {
         SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = SaveSmallPharmaceuticalApparatusSaveDataGroup(currentWater, incrementWater, waterMax, currentTemperature, temperatureMax, currentEnergy, temperatureConversionRatio, everyTimeBurningMultiple,
             _energyBurningTimeTask, _energyBurningEndTimeTask, _waterTank, _produce, _energyTank, attributeCompositionDurationDict, combustionInterval, currentCombustionTime, _itemSlotContent);
-        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SaveSmallPharmaceuticalApparatusSaveDataGroup(1, smallPharmaceuticalApparatusSaveDataGroup);
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SaveSmallPharmaceuticalApparatusSaveDataGroup(1, smallPharmaceuticalApparatusSaveDataGroup);
     }
 
     private SmallPharmaceuticalApparatusSaveDataGroup SaveSmallPharmaceuticalApparatusSaveDataGroup(int currentWater, int incrementWater, int waterMax, int currentTemperature, int temperatureMax, float currentEnergy, int temperatureConversionRatio, int everyTimeBurningMultiple,
@@ -591,7 +591,6 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         smallPharmaceuticalApparatusSaveDataGroup.energyBurningEndTimeTask = energyBurningEndTimeTask;
         if (waterTank.item == null)
         {
-            Debug.Log(1);
             smallPharmaceuticalApparatusSaveDataGroup.waterTank = null;
         }
         else
@@ -601,8 +600,6 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
         if (produce.item == null)
         {
-            Debug.Log(1);
-
             smallPharmaceuticalApparatusSaveDataGroup.produce = null;
         }
         else
@@ -612,8 +609,6 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
         if (energyTank.item == null)
         {
-            Debug.Log(1);
-
             smallPharmaceuticalApparatusSaveDataGroup.energyTank = null;
         }
         else
@@ -643,7 +638,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     private void Load()
     {
-        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = ListenerComponent.Instance.itemSlotDataSaveSceneComponent.GetSmallPharmaceuticalApparatusSaveDataGroup(1);
+        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.GetSmallPharmaceuticalApparatusSaveDataGroup(1);
         if (smallPharmaceuticalApparatusSaveDataGroup == null)
         {
             return;
@@ -651,7 +646,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
         foreach (ItemSlotSaveData itemSlotSaveData in smallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData)
         {
-            Item item = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(itemSlotSaveData.itemId);
+            Item item = ListenerFrameComponent.Instance.atlasSceneComponent.CreateItemByItemId(itemSlotSaveData.itemId);
             item.attributeValueList = itemSlotSaveData.attributeValueList;
             AddItem(item, itemSlotSaveData.itemSlotIndex);
         }
@@ -659,7 +654,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         //水容器
         if (smallPharmaceuticalApparatusSaveDataGroup.waterTank.itemSlotIndex != -1)
         {
-            Item waterTankItem = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.waterTank.itemId);
+            Item waterTankItem = ListenerFrameComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.waterTank.itemId);
             waterTankItem.attributeValueList = smallPharmaceuticalApparatusSaveDataGroup.waterTank.attributeValueList;
             _waterTank.AddItem(waterTankItem);
         }
@@ -667,7 +662,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         //能量容器
         if (smallPharmaceuticalApparatusSaveDataGroup.energyTank.itemSlotIndex != -1)
         {
-            Item energyTankItem = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.energyTank.itemId);
+            Item energyTankItem = ListenerFrameComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.energyTank.itemId);
             energyTankItem.attributeValueList = smallPharmaceuticalApparatusSaveDataGroup.energyTank.attributeValueList;
             _energyTank.AddItem(energyTankItem);
         }
@@ -675,7 +670,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         //输出容器
         if (smallPharmaceuticalApparatusSaveDataGroup.produce.itemSlotIndex != -1)
         {
-            Item produceItem = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.produce.itemId);
+            Item produceItem = ListenerFrameComponent.Instance.atlasSceneComponent.CreateItemByItemId(smallPharmaceuticalApparatusSaveDataGroup.produce.itemId);
             produceItem.attributeValueList = smallPharmaceuticalApparatusSaveDataGroup.produce.attributeValueList;
             _produce.AddItem(produceItem);
         }

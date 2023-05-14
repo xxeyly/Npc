@@ -61,9 +61,9 @@ namespace XFramework
             //播放背景音乐
             PlayBackgroundAudio();
         }
+
         public override void FrameSceneInitComponent()
         {
-            
         }
 
         public override void FrameEndComponent()
@@ -76,16 +76,20 @@ namespace XFramework
         {
             if (_audioDlc.ContainsKey(audioName))
             {
+                _effectAudioSource.volume = 1;
                 _effectAudioSource.clip = _audioDlc[audioName];
                 _effectAudioSource.Play();
             }
         }
-        
+
         public float GetEffectAudioLength(string audioName)
         {
             if (_audioDlc.ContainsKey(audioName))
             {
-                return _effectAudioSource.clip.length;
+                if (_effectAudioSource.clip != null)
+                {
+                    return _effectAudioSource.clip.length;
+                }
             }
 
             return -1;

@@ -19,8 +19,8 @@ namespace XFramework
         public List<string> GetReplaceContent()
         {
             List<string> replaceContent = new List<string>();
-            List<string> animatorPath = DataComponent.GetSpecifyTypeOnlyInAssetsPath("controller");
-            List<RuntimeAnimatorController> animators = DataComponent.GetSpecifyTypeOnlyInAssetsByFilePath<RuntimeAnimatorController>(animatorPath);
+            List<string> animatorPath = DataFrameComponent.GetSpecifyTypeOnlyInAssetsPath("controller");
+            List<RuntimeAnimatorController> animators = DataFrameComponent.GetSpecifyTypeOnlyInAssetsByFilePath<RuntimeAnimatorController>(animatorPath);
             foreach (RuntimeAnimatorController animator in animators)
             {
                 foreach (AnimationClip animatorAnimationClip in animator.animationClips)

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace XFramework
 {
-    public abstract class FrameComponent : MonoBehaviour, IComponent
+    public abstract class FrameComponent : SerializedMonoBehaviour, IComponent
     {
         public abstract void FrameInitComponent();
         public abstract void FrameSceneInitComponent();

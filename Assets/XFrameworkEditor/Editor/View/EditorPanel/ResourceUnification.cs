@@ -26,7 +26,7 @@ namespace XFramework
                 return;
             }
 
-            List<Text> sceneAllText = DataComponent.GetAllObjectsInScene<Text>();
+            List<Text> sceneAllText = DataFrameComponent.GetAllObjectsInScene<Text>();
             foreach (Text text in sceneAllText)
             {
                 text.font = changeFont;
@@ -45,7 +45,7 @@ namespace XFramework
         [Button("替换文字", ButtonSizes.Medium)]
         public void OnReplaceSceneGameObjectName()
         {
-            foreach (GameObject sceneObj in DataComponent.GetAllObjectsOnlyInScene())
+            foreach (GameObject sceneObj in DataFrameComponent.GetAllObjectsOnlyInScene())
             {
                 string replace = sceneObj.name.Replace(sceneReplaceBeforeName, sceneReplaceAfterName);
                 sceneObj.name = replace;
@@ -63,7 +63,7 @@ namespace XFramework
         [Button("替换文字", ButtonSizes.Medium)]
         public void OnReplaceTextContent()
         {
-            foreach (Text text in DataComponent.GetAllObjectsInScene<Text>())
+            foreach (Text text in DataFrameComponent.GetAllObjectsInScene<Text>())
             {
                 string replace = text.text.Replace(textReplaceBeforeName, textReplaceAfterName);
                 text.text = replace;
@@ -78,7 +78,6 @@ namespace XFramework
 
         [BoxGroup("字体压缩")]
         /*public TMP_FontAsset TargetFontAsset;*/
-
         /*
         [BoxGroup("字体压缩")]
         [Button("TextMeshPro字体压缩", ButtonSizes.Medium)]
@@ -86,7 +85,6 @@ namespace XFramework
         {
             ExtractTexture(AssetDatabase.GetAssetPath(TargetFontAsset));
         }*/
-
         /*
         //这里的fontPath是绝对路径
         public void ExtractTexture(string fontPath)
@@ -108,13 +106,13 @@ namespace XFramework
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }*/
-
         [BoxGroup("图片压缩")]
         [LabelText("平台类型")]
         public enum PlatformType
         {
             WebGl,
-            Android
+            Android,
+            PC
         }
 
         [BoxGroup("图片压缩/信息")] [LabelText("平台")]
@@ -130,11 +128,11 @@ namespace XFramework
         [Button("图片压缩(Png.Jpg.Tif.Tiff.Tga)", ButtonSizes.Medium)]
         public void OnTextureCompress()
         {
-            List<string> pngPaths = DataComponent.GetSpecifyTypeOnlyInAssetsPath("png");
-            List<string> jpgPaths = DataComponent.GetSpecifyTypeOnlyInAssetsPath("jpg");
-            List<string> tifPaths = DataComponent.GetSpecifyTypeOnlyInAssetsPath("tif");
-            List<string> tiffPaths = DataComponent.GetSpecifyTypeOnlyInAssetsPath("tiff");
-            List<string> tgaPaths = DataComponent.GetSpecifyTypeOnlyInAssetsPath("tga");
+            List<string> pngPaths = DataFrameComponent.GetSpecifyTypeOnlyInAssetsPath("png");
+            List<string> jpgPaths = DataFrameComponent.GetSpecifyTypeOnlyInAssetsPath("jpg");
+            List<string> tifPaths = DataFrameComponent.GetSpecifyTypeOnlyInAssetsPath("tif");
+            List<string> tiffPaths = DataFrameComponent.GetSpecifyTypeOnlyInAssetsPath("tiff");
+            List<string> tgaPaths = DataFrameComponent.GetSpecifyTypeOnlyInAssetsPath("tga");
             OnTextureCompressByPath(pngPaths);
             OnTextureCompressByPath(jpgPaths);
             OnTextureCompressByPath(tifPaths);
@@ -159,7 +157,7 @@ namespace XFramework
                         case PlatformType.WebGl:
                             textureImporter.SetPlatformTextureSettings(new TextureImporterPlatformSettings()
                             {
-                                maxTextureSize = 1024,
+                                maxTextureSize = 2048,
                                 compressionQuality = 50,
                                 name = "WebGL",
                                 overridden = true,
@@ -174,6 +172,16 @@ namespace XFramework
                                 maxTextureSize = 2048,
                                 compressionQuality = 50,
                                 name = "Android",
+                                overridden = true,
+                                format = TextureImporterFormat.DXT5Crunched
+                            });
+                            break;
+                        case PlatformType.PC:
+                            textureImporter.SetPlatformTextureSettings(new TextureImporterPlatformSettings()
+                            {
+                                maxTextureSize = 1024,
+                                compressionQuality = 50,
+                                name = "Standalone",
                                 overridden = true,
                                 format = TextureImporterFormat.DXT5Crunched
                             });

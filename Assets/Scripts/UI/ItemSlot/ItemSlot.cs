@@ -77,9 +77,9 @@ public class ItemSlot : ChildBaseWindow
 
     private void OnEventEnter(BaseEventData targetObj)
     {
-        if (ListenerComponent.Instance.tempDragItemSlot.GetDragSate())
+        if (ListenerFrameComponent.Instance.tempDragItemSlot.GetDragSate())
         {
-            ListenerComponent.Instance.tempDragItemSlot.SetEnterItemSlot(this);
+            ListenerFrameComponent.Instance.tempDragItemSlot.SetEnterItemSlot(this);
         }
 
         ShowItemAttribute();
@@ -87,12 +87,12 @@ public class ItemSlot : ChildBaseWindow
 
     private void OnEventExit(BaseEventData targetObj)
     {
-        if (ListenerComponent.Instance.tempDragItemSlot.GetDragSate())
+        if (ListenerFrameComponent.Instance.tempDragItemSlot.GetDragSate())
         {
-            ListenerComponent.Instance.tempDragItemSlot.SetEnterItemSlotNull();
+            ListenerFrameComponent.Instance.tempDragItemSlot.SetEnterItemSlotNull();
         }
 
-        ListenerComponent.Instance.itemAttributeShow.HideItemAttribute();
+        ListenerFrameComponent.Instance.itemAttributeShow.HideItemAttribute();
     }
 
     private void OnEventDown(BaseEventData targetObj)
@@ -103,7 +103,7 @@ public class ItemSlot : ChildBaseWindow
         }
 
 
-        ListenerComponent.Instance.personalBelongings.SetDragItemSlot(this);
+        ListenerFrameComponent.Instance.personalBelongings.SetDragItemSlot(this);
         item = null;
         UpdateItemUI();
         RemoveItemEvent?.Invoke();
@@ -111,9 +111,9 @@ public class ItemSlot : ChildBaseWindow
 
     private void OnEventUp(BaseEventData targetObj)
     {
-        if (ListenerComponent.Instance.tempDragItemSlot.GetDragSate())
+        if (ListenerFrameComponent.Instance.tempDragItemSlot.GetDragSate())
         {
-            ListenerComponent.Instance.tempDragItemSlot.RemoveDragItemSlot();
+            ListenerFrameComponent.Instance.tempDragItemSlot.RemoveDragItemSlot();
         }
     }
 
@@ -163,7 +163,7 @@ public class ItemSlot : ChildBaseWindow
     {
         if (item != null)
         {
-            ListenerComponent.Instance.itemAttributeShow.ShowItemAttribute(item, transform.position + new Vector3(152 / 2f, 152 / 2f));
+            ListenerFrameComponent.Instance.itemAttributeShow.ShowItemAttribute(item, transform.position + new Vector3(152 / 2f, 152 / 2f));
         }
     }
 
@@ -197,7 +197,7 @@ public class ItemSlot : ChildBaseWindow
             DisPlayObj(true, _normal, _itemIcon, _content);
             DisPlayObj(false, _null);
             _itemIcon.sprite = item.ItemIcon;
-            if (ListenerComponent.Instance.atlasSceneComponent.GetItemUnlocking(item))
+            if (ListenerFrameComponent.Instance.atlasSceneComponent.GetItemUnlocking(item))
             {
                 _content.text = item.ItemName;
             }

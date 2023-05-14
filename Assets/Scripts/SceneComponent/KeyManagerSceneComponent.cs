@@ -15,10 +15,6 @@ public class KeyManagerSceneComponent : SceneComponent
     {
     }
 
-    public override void InitComponent()
-    {
-    }
-
     public override void EndComponent()
     {
     }

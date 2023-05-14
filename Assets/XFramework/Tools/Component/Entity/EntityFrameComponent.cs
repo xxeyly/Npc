@@ -5,38 +5,10 @@ using UnityEngine;
 
 namespace XFramework
 {
-    [Serializable]
-    public class EntityComponentDataInfo
-    {
-        [HideLabel] [HorizontalGroup("实体标签")] public string entityGroupTag;
-        [HideLabel] [HorizontalGroup("实体组")] public List<EntityItem> entityGroup;
-    }
-
-    [Serializable]
-    public class EditorEntityComponentDataInfo
-    {
-        [HideLabel] [HorizontalGroup("实体标签")] public string entityGroupTag;
-        [HideLabel] [HorizontalGroup("实体组")] public List<EntityItem> entityGroup;
-
-        [HideLabel]
-        [Button("仅显示当前组")]
-        public void OnOnlyShow()
-        {
-            EntityFrameComponent entityFrameComponent = UnityEngine.Object.FindObjectOfType<EntityFrameComponent>();
-            entityFrameComponent.DisplayEditorEntityGroup(entityGroupTag, true, true);
-        }
-    }
-
     public partial class EntityFrameComponent : FrameComponent
     {
         public static EntityFrameComponent Instance;
         [Searchable] [LabelText("场景所有实体")] public List<EntityItem> sceneEntity;
-
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)] [LabelText("实体组")]
-        public List<EntityComponentDataInfo> entityComponentDataInfos;
-
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)] [LabelText("编辑器实体组")]
-        public List<EditorEntityComponentDataInfo> editorEntityComponentDataInfos;
 
         public delegate void DelegateOnShowEntity(string entityName);
 
@@ -46,68 +18,58 @@ namespace XFramework
 
         public DelegateOnHideEntity onHideEntity;
 
-        public void TryAddEntity(EntityItem entityItem)
+        public GameObject Instantiate(GameObject instantiate)
         {
-            //读取添加的每个实体的所有实体组
-            for (int i = 0; i < entityItem.entityTags.Count; i++)
-            {
-                bool isCon = false;
-                foreach (EntityComponentDataInfo entityComponentDataInfo in entityComponentDataInfos)
-                {
-                    if (entityComponentDataInfo.entityGroupTag == entityItem.entityTags[i])
-                    {
-                        isCon = true;
-                        entityComponentDataInfo.entityGroup.Add(entityItem);
-                    }
-                }
+            GameObject tempInstantiate = GameObject.Instantiate(instantiate);
+            InstantiateInit(tempInstantiate);
+            return tempInstantiate;
+        }
 
-                if (!isCon)
-                {
-                    entityComponentDataInfos.Add(new EntityComponentDataInfo()
-                    {
-                        entityGroupTag = entityItem.entityTags[i],
-                        entityGroup = new List<EntityItem>() { entityItem }
-                    });
-                }
-            }
-#if UNITY_EDITOR
-            for (int i = 0; i < entityItem.editorEntityTags.Count; i++)
-            {
-                bool isCon = false;
-                foreach (EditorEntityComponentDataInfo editorEntityComponentDataInfo in editorEntityComponentDataInfos)
-                {
-                    if (editorEntityComponentDataInfo.entityGroupTag == entityItem.editorEntityTags[i])
-                    {
-                        isCon = true;
-                        editorEntityComponentDataInfo.entityGroup.Add(entityItem);
-                    }
-                }
+        public GameObject Instantiate(GameObject instantiate, Transform parent, bool world)
+        {
+            GameObject tempInstantiate = GameObject.Instantiate(instantiate, parent, world);
+            InstantiateInit(tempInstantiate);
 
-                if (!isCon)
-                {
-                    editorEntityComponentDataInfos.Add(new EditorEntityComponentDataInfo()
-                    {
-                        entityGroupTag = entityItem.editorEntityTags[i],
-                        entityGroup = new List<EntityItem>() { entityItem }
-                    });
-                }
+            return tempInstantiate;
+        }
+
+        private void InstantiateInit(GameObject instantiate)
+        {
+            foreach (EntityItem entityItem in instantiate.transform.GetComponentsInChildren<EntityItem>())
+            {
+                entityItem.AddToEntityList();
             }
-#endif
+
+            foreach (AnimatorControllerBase animatorControllerBase in instantiate.transform.GetComponentsInChildren<AnimatorControllerBase>())
+            {
+                animatorControllerBase.AddToAnimatorControllerList();
+            }
         }
 
         public override void FrameInitComponent()
         {
             Instance = GetComponent<EntityFrameComponent>();
-            EntityInit();
-
         }
+
         public override void FrameSceneInitComponent()
         {
-            
+            EntityInit();
         }
 
         public override void FrameEndComponent()
         {
+        }
+
+        public void RemoveSceneEntityName()
+        {
+            List<EntityItem> tempEntityItems = DataFrameComponent.GetAllObjectsInScene<EntityItem>(GameRootStart.Instance.loadScene.name);
+            for (int i = 0; i < tempEntityItems.Count; i++)
+            {
+                if (sceneEntity.Contains(tempEntityItems[i]))
+                {
+                    sceneEntity.Remove(tempEntityItems[i]);
+                }
+            }
         }
 
         [LabelText("场景道具初始化")]
@@ -115,169 +77,24 @@ namespace XFramework
         [GUIColor(0, 1, 0)]
         public void EntityInit()
         {
-            entityComponentDataInfos.Clear();
-#if UNITY_EDITOR
-            editorEntityComponentDataInfos.Clear();
-#endif
-            // sceneEntity = new List<EntityItem>(GameObject.FindObjectsOfType<EntityItem>());
-            sceneEntity = DataComponent.GetAllObjectsInScene<EntityItem>();
-            foreach (EntityItem entityItem in sceneEntity)
+            List<EntityItem> tempEntity = new List<EntityItem>();
+            //首场景,加载全部
+            if (GameRootStart.Instance.loadScene.name == String.Empty)
             {
-                TryAddEntity(entityItem);
+                tempEntity = DataFrameComponent.GetAllObjectsInScene<EntityItem>();
             }
-        }
-
-
-        /// <summary>
-        /// 实体组控制
-        /// </summary>
-        /// <param name="display"></param>
-        /// <param name="groupTag"></param>
-        public void DisplayEntityGroup(bool display, params string[] groupTag)
-        {
-            foreach (string groupName in groupTag)
+            else
             {
-                DisplayEntityGroup(groupName, display, false);
-            }
-        }
-
-        /// <summary>
-        /// 实体组控制
-        /// </summary>
-        /// <param name="groupTag"></param>
-        /// <param name="display"></param>
-        /// <param name="hideOther"></param>
-        public void DisplayEntityGroup(string groupTag, bool display, bool hideOther = false)
-        {
-            List<EntityItem> entityGroup = null;
-            foreach (EntityComponentDataInfo entityComponentDataInfo in entityComponentDataInfos)
-            {
-                if (entityComponentDataInfo.entityGroupTag == groupTag)
-                {
-                    entityGroup = entityComponentDataInfo.entityGroup;
-                    break;
-                }
+                tempEntity = DataFrameComponent.GetAllObjectsInScene<EntityItem>(GameRootStart.Instance.loadScene.name);
             }
 
-            if (entityGroup == null)
+            foreach (EntityItem entityItem in tempEntity)
             {
-                Debug.LogError("实体组未定义");
-                return;
-            }
-
-            //先显示
-            foreach (EntityItem entityItem in entityGroup)
-            {
-                if (display)
+                if (!sceneEntity.Contains(entityItem))
                 {
-                    entityItem.Show();
-                }
-                else
-                {
-                    entityItem.Hide();
+                    sceneEntity.Add(entityItem);
                 }
             }
-
-            if (hideOther)
-            {
-                //创建一个临时场景实体组
-                List<EntityItem> tempSceEntityItems = new List<EntityItem>();
-                foreach (EntityItem entityItem in sceneEntity)
-                {
-                    tempSceEntityItems.Add(entityItem);
-                }
-
-                //移除当前要显示的实体
-                foreach (EntityItem entityItem in entityGroup)
-                {
-                    tempSceEntityItems.Remove(entityItem);
-                }
-
-                //隐藏剩余实体
-                foreach (EntityItem tempSceEntityItem in tempSceEntityItems)
-                {
-                    tempSceEntityItem.Hide();
-                }
-
-                //清空
-                tempSceEntityItems.Clear();
-            }
-        }
-
-        /// <summary>
-        /// 实体组控制
-        /// </summary>
-        /// <param name="groupTag"></param>
-        /// <param name="display"></param>
-        /// <param name="hideOther"></param>
-        public void DisplayEditorEntityGroup(string groupTag, bool display, bool hideOther = false)
-        {
-            List<EntityItem> entityGroup = null;
-            foreach (EditorEntityComponentDataInfo editorEntityComponentDataInfo in editorEntityComponentDataInfos)
-            {
-                if (editorEntityComponentDataInfo.entityGroupTag == groupTag)
-                {
-                    entityGroup = editorEntityComponentDataInfo.entityGroup;
-                    break;
-                }
-            }
-
-            if (entityGroup == null)
-            {
-                Debug.LogError("实体组未定义");
-                return;
-            }
-
-            //先显示
-            foreach (EntityItem entityItem in entityGroup)
-            {
-                if (display)
-                {
-                    entityItem.Show();
-                }
-                else
-                {
-                    entityItem.Hide();
-                }
-            }
-
-            if (hideOther)
-            {
-                //创建一个临时场景实体组
-                List<EntityItem> tempSceEntityItems = new List<EntityItem>();
-                foreach (EntityItem entityItem in sceneEntity)
-                {
-                    tempSceEntityItems.Add(entityItem);
-                }
-
-                //移除当前要显示的实体
-                foreach (EntityItem entityItem in entityGroup)
-                {
-                    tempSceEntityItems.Remove(entityItem);
-                }
-
-                //隐藏剩余实体
-                foreach (EntityItem tempSceEntityItem in tempSceEntityItems)
-                {
-                    tempSceEntityItem.Hide();
-                }
-
-                //清空
-                tempSceEntityItems.Clear();
-            }
-        }
-
-        public List<EntityItem> GetEntityItemByEntityGroupName(string groupName)
-        {
-            foreach (EntityComponentDataInfo entityComponentDataInfo in entityComponentDataInfos)
-            {
-                if (entityComponentDataInfo.entityGroupTag == groupName)
-                {
-                    return entityComponentDataInfo.entityGroup;
-                }
-            }
-
-            return null;
         }
 
         public List<EntityItem> GetEntityItemByEntityName(string entityName)
@@ -310,13 +127,9 @@ namespace XFramework
         /// </summary>
         public void EntityAllShow()
         {
-            foreach (EntityComponentDataInfo entityComponentDataInfo in entityComponentDataInfos)
+            foreach (EntityItem entityItem in sceneEntity)
             {
-                //先显示
-                foreach (EntityItem entityItem in entityComponentDataInfo.entityGroup)
-                {
-                    entityItem.Show();
-                }
+                entityItem.Show();
             }
         }
 
@@ -326,7 +139,7 @@ namespace XFramework
         /// <param name="entityName"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetFirstEntityItemByName<T>(string entityName) 
+        public T GetFirstEntityItemByName<T>(string entityName)
         {
             foreach (EntityItem entityItem in sceneEntity)
             {
@@ -339,6 +152,11 @@ namespace XFramework
             return default(T);
         }
 
+        /// <summary>
+        /// 根据实体名称获得第一个实体
+        /// </summary>
+        /// <param name="entityName"></param>
+        /// <returns></returns>
         public EntityItem GetFirstEntityItemByName(string entityName)
         {
             foreach (EntityItem entityItem in sceneEntity)

@@ -38,25 +38,14 @@ namespace XFramework
 
             _allScriptsContentDic = new Dictionary<string, string>();
             allScriptPath = new List<string>();
-            //获取指定路径下面的所有资源文件  
-            if (Directory.Exists(scriptsPath))
-            {
-                DirectoryInfo direction = new DirectoryInfo(scriptsPath);
-                FileInfo[] files = direction.GetFiles("*", SearchOption.AllDirectories);
-                for (int i = 0; i < files.Length; i++)
-                {
-                    //忽略关联文件与特殊类
-                    if (files[i].Name.EndsWith(".meta") || files[i].Name == "BaseWidnow.cs" ||
-                        files[i].Name == "ListenerComponentData.cs")
-                    {
-                        continue;
-                    }
+            List<string> classPath = DataFrameComponent.GetGetSpecifyPathInAllTypePath("Assets", "cs");
 
-                    //添加类名称
-                    allScriptPath.Add(files[i].Name);
-                    //读取类内容
-                    _allScriptsContentDic.Add(files[i].Name.Replace(".cs", ""),
-                        FileOperation.GetTextToLoad(FileOperation.ConvertToLocalPath(files[i].FullName)));
+            for (int i = 0; i < classPath.Count; i++)
+            {
+                if (!classPath[i].Contains("XFramework") && !_allScriptsContentDic.ContainsKey(DataFrameComponent.GetPathFileNameDontContainFileType(classPath[i])))
+                {
+                    allScriptPath.Add(DataFrameComponent.GetPathFileName(classPath[i]));
+                    _allScriptsContentDic.Add(DataFrameComponent.GetPathFileNameDontContainFileType(classPath[i]), FileOperation.GetTextToLoad(classPath[i]));
                 }
             }
 
@@ -311,7 +300,7 @@ namespace XFramework
                             temp = ",";
                         }
 
-                        methodName += GenerateGeneral.Indents(16) + "Instance.ExecuteEvent(\"" + pair.Key + "_" +
+                        methodName += GenerateGeneral.Indents(16) + "Instance.ExecuteEvent(\"" + pair.Key + "-" +
                                       valuePair.Key + "\"" + temp + listenePparameter + ");" + GenerateGeneral.LineFeed;
                         methodName += GenerateGeneral.Indents(12) + "}" + GenerateGeneral.LineFeed;
                         classMethod.Add(methodName);
@@ -403,7 +392,7 @@ namespace XFramework
                         }
 
                         methodName += GenerateGeneral.Indents(16) + "return Instance.ExecuteReturnEvent" + variable +
-                                      "(\"" + pair.Key + "_" +
+                                      "(\"" + pair.Key + "-" +
                                       valuePair.Key + "\"" + temp + listenePparameter + ");" + GenerateGeneral.LineFeed;
                         methodName += GenerateGeneral.Indents(12) + "}" + GenerateGeneral.LineFeed;
                         classMethod.Add(methodName);
@@ -429,7 +418,7 @@ namespace XFramework
             //生成类
             foreach (KeyValuePair<string, List<string>> pair in classMethodGroup)
             {
-                generateClassContent += GenerateGeneral.Indents(8) + "public " + pair.Key + " " + DataComponent.FirstCharToLower(pair.Key) + " = new " + pair.Key + "()" + ";" +
+                generateClassContent += GenerateGeneral.Indents(8) + "[HideInInspector] public " + pair.Key + " " + DataFrameComponent.FirstCharToLower(pair.Key) + " = new " + pair.Key + "()" + ";" +
                                         GenerateGeneral.LineFeed;
             }
 

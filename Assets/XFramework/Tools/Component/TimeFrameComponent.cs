@@ -14,9 +14,9 @@ namespace XFramework
     public class TimeFrameComponent : FrameComponent
     {
         public static TimeFrameComponent Instance;
-        private List<TimeTask> _taskTimeList;
-        private List<TimeTask> _taskTimeImmortalList;
-        private List<SwitchTask> _taskSwitchList;
+        [SerializeField] private List<TimeTask> _taskTimeList;
+        [SerializeField] private List<TimeTask> _taskTimeImmortalList;
+        [SerializeField] private List<SwitchTask> _taskSwitchList;
         private List<int> _tidTimeList;
         private List<int> _tidTimeImmortalList;
         private List<int> _tidSwitchList;
@@ -48,6 +48,11 @@ namespace XFramework
         public override void FrameInitComponent()
         {
             Instance = GetComponent<TimeFrameComponent>();
+        }
+
+        public override void FrameSceneInitComponent()
+        {
+            currentRunTime = 0;
             _taskTimeList = new List<TimeTask>();
             _taskSwitchList = new List<SwitchTask>();
             _taskTimeImmortalList = new List<TimeTask>();
@@ -74,10 +79,6 @@ namespace XFramework
                     Debug.Log("过期了");
                 }
             }
-        }
-
-        public override void FrameSceneInitComponent()
-        {
         }
 
         private void FixedUpdate()
@@ -204,6 +205,7 @@ namespace XFramework
                 tid = timeTask.Tid,
                 tidName = timeTask.TaskName,
                 loopType = TimeTaskList.TimeLoopType.Once,
+                waitingTime = delay,
                 endTime = destTime
             });
             if (onAddTimeTask != null)
@@ -483,7 +485,7 @@ namespace XFramework
                 }
             }
 
-            onDeleteSwitchTask.Invoke(tid);
+            onDeleteSwitchTask?.Invoke(tid);
 
             return exist;
         }
@@ -890,16 +892,18 @@ namespace XFramework
     /// <summary>
     /// 定时任务数据类
     /// </summary>
+    [Serializable]
     public class TimeTask
     {
-        public int Tid; //任务ID
-        public string TaskName; //任务名称
-        public float DestTime; //执行时间
-        public UnityAction Callback; // 执行的逻辑
-        public int Count; //执行次数
-        public float Delay; //执行间隔
+        [LabelText("任务ID")] public int Tid; //任务ID
+        [LabelText("任务名称")] public string TaskName; //任务名称
+        [LabelText("执行时间")] public float DestTime; //执行时间
+        [LabelText("执行的逻辑")] public UnityAction Callback; // 执行的逻辑
+        [LabelText("执行次数")] public int Count; //执行次数
+        [LabelText("执行间隔")] public float Delay; //执行间隔
     }
 
+    [Serializable]
     public class SwitchTask
     {
         public int Tid; //任务ID

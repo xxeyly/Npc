@@ -13,10 +13,6 @@ public class AttributeCompositionSceneComponent : SceneComponent
         AddReturnListenerEvent<List<Attribute>, List<AttributeComposition>>("GetQualifiedAttributeComposition", GetQualifiedAttributeComposition);
     }
 
-    public override void InitComponent()
-    {
-    }
-
     public override void EndComponent()
     {
     }

@@ -6,18 +6,17 @@ namespace XFramework
     public abstract partial class SceneComponent : SerializedMonoBehaviour, ISceneComponent
     {
         public abstract void StartComponent();
-        public abstract void InitComponent();
         public abstract void EndComponent();
 
         public void AddToSceneComponent()
         {
-            if (!GameRootStart.Instance.sceneStartSingletons.Contains(this))
+            if (GameRootStart.Instance.sceneComponents.Contains(this))
             {
-                GameRootStart.Instance.sceneStartSingletons.Add(this);
-                StartComponent();
-                InitComponent();
+                return;
             }
-            
+
+            GameRootStart.Instance.sceneComponents.Add(this);
+            StartComponent();
         }
     }
 }

@@ -34,10 +34,6 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
         _itemSlotDataLoadEvent?.Invoke();
     }
 
-    public override void InitComponent()
-    {
-    }
-
     public override void EndComponent()
     {
     }
@@ -106,8 +102,6 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
 
     private void SaveSmallPharmaceuticalApparatusSaveDataGroup(int index, SmallPharmaceuticalApparatusSaveDataGroup saveSmallPharmaceuticalApparatusSaveDataGroup)
     {
-        Debug.Log(saveSmallPharmaceuticalApparatusSaveDataGroup.waterTank);
-
         if (UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset") == null)
         {
             UnityEditor.AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<SmallPharmaceuticalApparatusSaveDataGroup>(), General.assetRootPath + "Save/" + index + ".asset");

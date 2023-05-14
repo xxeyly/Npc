@@ -54,12 +54,13 @@ namespace XFramework
             typeof(SceneLoadFrameComponent),
             typeof(RuntimeDataFrameComponent),
             typeof(EntityFrameComponent),
-            typeof(ListenerComponent),
+            typeof(ListenerFrameComponent),
             typeof(AudioFrameComponent),
             typeof(HttpFrameComponent),
             typeof(MouseFrameComponent),
             typeof(TimeFrameComponent),
             typeof(ViewFrameComponent),
+            typeof(HotFixFrameComponent),
         };
 
 
@@ -145,6 +146,9 @@ namespace XFramework
 
         [LabelText("存放路径根路径")] public static string assetRootPath =
             "Assets/Config/";
+
+        [LabelText("存放路径根路径")] public static string assetScenePath =
+            "Assets/Config/Scene/";
 
         [LabelText("自动打包配置存放路径")] public static string customBuildDataPath =
             assetRootPath + "CustomBuildData.asset";

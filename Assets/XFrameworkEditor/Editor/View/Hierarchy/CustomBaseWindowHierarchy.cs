@@ -27,7 +27,7 @@ namespace XFramework
 
                     if (tempBaseWindow.GetViewShowType() == ViewShowType.Static)
                     {
-                        GUI.Label(SetRect(selectionrect, 0, 18), "S");
+                        GUI.Label(SetRect(selectionrect, -7, 18), "S");
                     }
 
                     #endregion
@@ -40,7 +40,7 @@ namespace XFramework
                         Rect viewNameRect;
                         if (General.HierarchyContentFollow)
                         {
-                            viewNameRect = new Rect(selectionrect.position + new Vector2(18 + DataComponent.CalculationHierarchyContentLength(obj.name), 0), selectionrect.size);
+                            viewNameRect = new Rect(selectionrect.position + new Vector2(18 + DataFrameComponent.CalculationHierarchyContentLength(obj.name), 0), selectionrect.size);
                         }
                         else
                         {
@@ -59,7 +59,25 @@ namespace XFramework
                     rectCheck.x += rectCheck.width - 20;
                     rectCheck.width = 18;
                     GameObject window = obj.transform.Find("Window").gameObject;
-                    window.SetActive(GUI.Toggle(SetRect(selectionrect, -20, 18), window.activeSelf, string.Empty));
+                    if (obj.transform.GetSiblingIndex() != 0)
+                    {
+                        if (GUI.Button(SetRect(selectionrect, -60, 18), "上"))
+                        {
+                            obj.transform.SetSiblingIndex(obj.transform.GetSiblingIndex() - 1);
+                        }
+                    }
+
+                    if (obj.transform.GetSiblingIndex() != obj.transform.parent.childCount - 1)
+                    {
+                        if (GUI.Button(SetRect(selectionrect, -42, 18), "下"))
+                        {
+                            obj.transform.SetSiblingIndex(obj.transform.GetSiblingIndex() + 1);
+                        }
+                    }
+
+                    tempBaseWindow.layerIndex = obj.transform.GetSiblingIndex();
+
+                    window.SetActive(GUI.Toggle(SetRect(selectionrect, -22, 18), window.activeSelf, string.Empty));
                     if (window.GetComponent<CanvasGroup>())
                     {
                         window.GetComponent<CanvasGroup>().alpha = window.activeSelf ? 1 : 0;

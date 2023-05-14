@@ -12,18 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b34e3da451cc4741b8ca3108ba487047, type: 3}
   m_Name: 1
   m_EditorClassIdentifier: 
-  itemSlotSaveData: []
+  itemSlotSaveData:
+  - itemSlotIndex: 0
+    itemId: -1
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: c03ed93f5ef0f6e40b60c8e44788bdf8, type: 2}
+      value: 5000
   currentWater: 0
   incrementWater: 10
   waterMax: 200
-  currentTemperature: 5
+  currentTemperature: 0
   temperatureMax: 20
-  currentEnergy: 450
+  currentEnergy: 500
   energyCache: 0
   temperatureConversionRatio: 1
   everyTimeBurningMultiple: 10
-  energyBurningTimeTask: 136608221
-  energyBurningEndTimeTask: 851168018
+  energyBurningTimeTask: 0
+  energyBurningEndTimeTask: 0
   waterTank:
     itemSlotIndex: -1
     itemId: 0
@@ -32,8 +37,6 @@ MonoBehaviour:
     itemSlotIndex: 0
     itemId: 4
     attributeValueList:
-    - attribute: {fileID: 11400000, guid: 98bb133a16102d84c9e6c482db79546a, type: 2}
-      value: 0
     - attribute: {fileID: 11400000, guid: 5bc3c311b66873d40bb7c9af6a8dd893, type: 2}
       value: 200
   energyTank:
@@ -51,4 +54,4 @@ MonoBehaviour:
     - attribute: {fileID: 11400000, guid: 62e473e85984b8142b7b28df24a27bd9, type: 2}
       value: 100
   combustionInterval: 1
-  currentCombustionTime: 0.0973201
+  currentCombustionTime: 0.8267947

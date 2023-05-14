@@ -9,7 +9,7 @@ using XFramework;
 #if UNITY_EDITOR
 public class AtlasSceneComponent : SceneComponent
 {
-    [LabelText("物品图鉴")] [SerializeField] [Searchable] [TableList(AlwaysExpanded = true)] [InlineEditor()] 
+    [LabelText("物品图鉴")] [SerializeField] [Searchable] [TableList(AlwaysExpanded = true)] [InlineEditor()]
     private ItemAtlas itemAtlas;
 
     [LabelText("解锁图鉴")] [SerializeField] private List<Item> unlockingItem = new List<Item>();
@@ -35,7 +35,7 @@ public class AtlasSceneComponent : SceneComponent
     [Button("创建属性")]
     public void CreateAttribute()
     {
-        List<Attribute> attributes = DataComponent.GetInheritAllSubclass<Attribute>();
+        List<Attribute> attributes = DataFrameComponent.GetInheritAllSubclass<Attribute>();
         foreach (Attribute attribute in attributes)
         {
             switch (attribute)
@@ -73,7 +73,6 @@ public class AtlasSceneComponent : SceneComponent
                 case WoodEnergyAttribute woodEnergyAttribute:
                     CreateAttribute<WoodEnergyAttribute>("木能量");
                     break;
-                
             }
         }
     }
@@ -93,7 +92,7 @@ public class AtlasSceneComponent : SceneComponent
 
     private Item CreateItemByItemId(int itemId)
     {
-        Item item = new Item();
+        Item item = null;
         foreach (Item itemAtlasItem in itemAtlas.Items)
         {
             if (itemAtlasItem.ItemId == itemId)
@@ -144,11 +143,10 @@ public class AtlasSceneComponent : SceneComponent
     {
         AddReturnListenerEvent<Item, bool>("GetItemUnlocking", GetItemUnlocking);
         AddReturnListenerEvent<int, Item>("CreateItemByItemId", CreateItemByItemId);
+        AddReturnListenerEvent<ItemAtlas>("GetItemAtlas", GetItemAtlas);
+        AddReturnListenerEvent<List<Item>>("GetUnlockingItem", GetUnlockingItem);
     }
 
-    public override void InitComponent()
-    {
-    }
 
     public override void EndComponent()
     {
@@ -157,6 +155,16 @@ public class AtlasSceneComponent : SceneComponent
     private bool GetItemUnlocking(Item item)
     {
         return unlockingItem.Contains(item);
+    }
+
+    private ItemAtlas GetItemAtlas()
+    {
+        return itemAtlas;
+    }
+
+    private List<Item> GetUnlockingItem()
+    {
+        return unlockingItem;
     }
 }
 #endif

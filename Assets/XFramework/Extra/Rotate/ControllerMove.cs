@@ -64,7 +64,7 @@ namespace XFramework
                     _yDis = (_currentMousePos.y - _oldMousePos.y) * movSpeed;
                     _xDis = (_currentMousePos.x - _oldMousePos.x) * movSpeed;
                     _oldMousePos = _currentMousePos;
-                    Vector3 cameraValue = DataComponent.GetInspectorEuler(targetCamera.transform);
+                    Vector3 cameraValue = DataFrameComponent.GetInspectorEuler(targetCamera.transform);
                     Quaternion rot = Quaternion.Euler(cameraValue.x, cameraValue.y, 0);
                     if (moveReversal)
                     {

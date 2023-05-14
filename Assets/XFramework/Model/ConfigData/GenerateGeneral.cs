@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace XFramework
 {
@@ -32,8 +34,7 @@ namespace XFramework
         /// <param name="insertStartMark"></param>
         /// <param name="insertEndMark"></param>
         /// <returns></returns>
-        public static string ReplaceScriptContent(string scriptsContent, string insertContent,
-            string insertStartMark, string insertEndMark)
+        public static string ReplaceScriptContent(string scriptsContent, string insertContent, string insertStartMark, string insertEndMark)
         {
             if (scriptsContent.Contains(insertStartMark) && scriptsContent.Contains(insertEndMark))
             {
@@ -49,13 +50,16 @@ namespace XFramework
 
                 //查找要被替换的内容
                 string scriptUsingContent = String.Empty;
+                StringBuilder stringBuilder = new StringBuilder();
                 for (int i = 0; i < scriptsContent.Length; i++)
                 {
                     if (i >= usingStartIndex && i < usingEndIndex)
                     {
-                        scriptUsingContent += scriptsContent[i];
+                        stringBuilder.Append(scriptsContent[i]);
                     }
                 }
+
+                scriptUsingContent = stringBuilder.ToString();
 
                 string tempInsertContent = String.Empty;
                 tempInsertContent += insertContent;
@@ -77,8 +81,7 @@ namespace XFramework
         /// <param name="insertStartMark"></param>
         /// <param name="insertEndMark"></param>
         /// <returns></returns>
-        public static string ReplaceScriptContent(string scriptsContent, List<string> insertContent,
-            string insertStartMark, string insertEndMark)
+        public static string ReplaceScriptContent(string scriptsContent, List<string> insertContent, string insertStartMark, string insertEndMark)
         {
             string temp = String.Empty;
             for (int i = 0; i < insertContent.Count; i++)
@@ -116,7 +119,7 @@ namespace XFramework
             for (int i = 0; i < path.Length; i++)
             {
                 if (UnityEditor.AssetDatabase.GUIDToAssetPath(path[i]).Contains("Assets") &&
-                    UnityEditor. AssetDatabase.GUIDToAssetPath(path[i]).Contains(scriptName + ".cs"))
+                    UnityEditor.AssetDatabase.GUIDToAssetPath(path[i]).Contains(scriptName + ".cs"))
                 {
                     return UnityEditor.AssetDatabase.GUIDToAssetPath(path[i]);
                 }

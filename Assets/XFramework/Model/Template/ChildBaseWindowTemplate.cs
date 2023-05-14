@@ -1,5 +1,7 @@
-﻿//StartUsing
-//EndUsing
+﻿#region StartUsing
+
+#endregion EndUsing
+
 
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -8,8 +10,9 @@ using XFramework;
 [RequireComponent(typeof(ChildBaseWindowGenerateScripts))]
 public class ChildBaseWindowTemplate : ChildBaseWindow
 {
-    //StartUIVariable
-    //EndUIVariable
+    #region StartUIVariable
+
+    #endregion EndUIVariable
 
     public override void Init()
     {
@@ -17,17 +20,20 @@ public class ChildBaseWindowTemplate : ChildBaseWindow
 
     protected override void InitView()
     {
-        //StartVariableBindPath
-        //EndVariableBindPath
+        #region StartVariableBindPath
+
+        #endregion EndVariableBindPath
     }
 
     protected override void InitListener()
     {
-        //StartVariableBindListener
-        //EndVariableBindListener
+        #region StartVariableBindListener
+
+        #endregion EndVariableBindListener
     }
 
 
-    //StartVariableBindEvent
-    //EndVariableBindEvent
+    #region StartVariableBindEvent
+
+    #endregion EndVariableBindEvent
 }

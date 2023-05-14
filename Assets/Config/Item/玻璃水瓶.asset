@@ -17,7 +17,5 @@ MonoBehaviour:
   Describe: "\u4E00\u4E2A\u73BB\u7483\u74F6\u5B50\u53EF\u4EE5\u88C5\u6C34"
   ItemIcon: {fileID: 21300000, guid: 3869e31adcc9c9847a034445ec56aab8, type: 3}
   attributeValueList:
-  - attribute: {fileID: 11400000, guid: 98bb133a16102d84c9e6c482db79546a, type: 2}
-    value: 150
   - attribute: {fileID: 11400000, guid: 5bc3c311b66873d40bb7c9af6a8dd893, type: 2}
     value: 200

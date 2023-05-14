@@ -191,11 +191,6 @@ namespace XFramework
             }
         }
 
-
-        public override void InitComponent()
-        {
-        }
-
         public override void EndComponent()
         {
         }

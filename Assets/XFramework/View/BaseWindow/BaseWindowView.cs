@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace XFramework
 {
@@ -121,5 +122,25 @@ namespace XFramework
         }
 
         #endregion
+
+        public virtual void OnViewHide()
+        {
+        }
+
+        /// <summary>
+        /// 界面摧毁
+        /// </summary>
+        public virtual void OnViewDestroy()
+        {
+            RemoveAllListenerEvent();
+            RemoveThisView();
+            RemoveTimeTask();
+        }
+
+        private void RemoveThisView()
+        {
+            // Debug.Log(viewType + "摧毁");
+            ViewFrameComponent.Instance.RemoveView(GetType());
+        }
     }
 }

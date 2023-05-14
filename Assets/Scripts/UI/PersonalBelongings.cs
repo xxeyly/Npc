@@ -72,8 +72,8 @@ public class PersonalBelongings : BaseWindow
     //变量方法开始
     private void OnWindowMoveEventDown(BaseEventData targetObj)
     {
-        ListenerComponent.Instance.itemAttributeShow.HideItemAttribute();
-        ListenerComponent.Instance.itemAttributeShow.SetWindowDrag(true);
+        ListenerFrameComponent.Instance.itemAttributeShow.HideItemAttribute();
+        ListenerFrameComponent.Instance.itemAttributeShow.SetWindowDrag(true);
         _moveOffset = window.transform.position - Input.mousePosition;
         moveWindow = true;
     }
@@ -81,7 +81,7 @@ public class PersonalBelongings : BaseWindow
     private void OnWindowMoveEventUp(BaseEventData targetObj)
     {
         moveWindow = false;
-        ListenerComponent.Instance.itemAttributeShow.SetWindowDrag(false);
+        ListenerFrameComponent.Instance.itemAttributeShow.SetWindowDrag(false);
     }
 
     private void OnCloseClick(BaseEventData targetObj)
@@ -104,8 +104,8 @@ public class PersonalBelongings : BaseWindow
 
     private void InitStorageItem()
     {
-        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataSaveEvent(Save);
-        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataLoadEvent(Load);
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataSaveEvent(Save);
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataLoadEvent(Load);
     }
 
     private void UpdateItemMaxCount()
@@ -128,7 +128,7 @@ public class PersonalBelongings : BaseWindow
     [Button]
     private bool AddItem(Item item)
     {
-        item = ScriptableObject.CreateInstance<Item>();
+        item = item.GetNewItem();
         foreach (ItemSlot itemSlot in _itemSlotContent)
         {
             if (itemSlot.IsNull())
@@ -162,23 +162,23 @@ public class PersonalBelongings : BaseWindow
     [LabelText("设置拖拽物品格子")]
     private void SetDragItemSlot(ItemSlot itemSlot)
     {
-        ListenerComponent.Instance.tempDragItemSlot.SetDragItemSlot(itemSlot);
+        ListenerFrameComponent.Instance.tempDragItemSlot.SetDragItemSlot(itemSlot);
     }
 
     [LabelText("移除拖拽物品格子")]
     private void RemoveDragItemSlot()
     {
-        ListenerComponent.Instance.tempDragItemSlot.RemoveDragItemSlot();
+        ListenerFrameComponent.Instance.tempDragItemSlot.RemoveDragItemSlot();
     }
 
     private void Save()
     {
-        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.SaveItemSlotSaveDataGroup(0, _itemSlotContent);
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SaveItemSlotSaveDataGroup(0, _itemSlotContent);
     }
 
     private void Load()
     {
-        ItemSlotSaveDataGroup itemSlotSaveDataGroup = ListenerComponent.Instance.itemSlotDataSaveSceneComponent.GetItemSlotSaveDataGroup(0);
+        ItemSlotSaveDataGroup itemSlotSaveDataGroup = ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.GetItemSlotSaveDataGroup(0);
         if (itemSlotSaveDataGroup == null)
         {
             return;
@@ -186,7 +186,7 @@ public class PersonalBelongings : BaseWindow
 
         foreach (ItemSlotSaveData itemSlotSaveData in itemSlotSaveDataGroup.itemSlotSaveData)
         {
-            Item item = ListenerComponent.Instance.atlasSceneComponent.CreateItemByItemId(itemSlotSaveData.itemId);
+            Item item = ListenerFrameComponent.Instance.atlasSceneComponent.CreateItemByItemId(itemSlotSaveData.itemId);
             item.attributeValueList = itemSlotSaveData.attributeValueList;
             AddItem(item, itemSlotSaveData.itemSlotIndex);
         }

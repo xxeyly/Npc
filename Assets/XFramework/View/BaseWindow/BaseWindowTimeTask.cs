@@ -32,8 +32,7 @@ namespace XFramework
         protected int AddTimeTask(UnityAction callback, string taskName, float delay, int count = 1)
         {
             int timeTaskId = TimeFrameComponent.Instance.AddTimeTask(callback, taskName, delay, count);
-            timeTaskInfoList.Add(new TimeTaskInfo()
-                {timeTaskId = timeTaskId, timeLoopType = TimeTaskList.TimeLoopType.Once, timeTaskName = taskName});
+            timeTaskInfoList.Add(new TimeTaskInfo() { timeTaskId = timeTaskId, timeLoopType = TimeTaskList.TimeLoopType.Once, timeTaskName = taskName });
             return timeTaskId;
         }
 
@@ -49,7 +48,7 @@ namespace XFramework
         {
             int timeTaskId = TimeFrameComponent.Instance.AddSwitchTask(callbackList, taskName, delay, count);
             timeTaskInfoList.Add(new TimeTaskInfo()
-                {timeTaskId = timeTaskId, timeLoopType = TimeTaskList.TimeLoopType.Loop, timeTaskName = taskName});
+                { timeTaskId = timeTaskId, timeLoopType = TimeTaskList.TimeLoopType.Loop, timeTaskName = taskName });
             return timeTaskId;
         }
 
@@ -65,7 +64,7 @@ namespace XFramework
         {
             int timeTaskId = TimeFrameComponent.Instance.AddImmortalTimeTask(callback, taskName, delay, count);
             timeTaskInfoList.Add(new TimeTaskInfo()
-                {timeTaskId = timeTaskId, timeLoopType = TimeTaskList.TimeLoopType.Once, timeTaskName = taskName});
+                { timeTaskId = timeTaskId, timeLoopType = TimeTaskList.TimeLoopType.Once, timeTaskName = taskName });
             return timeTaskId;
         }
 
@@ -123,14 +122,12 @@ namespace XFramework
         {
             int twinkleTimeTask = TimeFrameComponent.Instance.ImageTwinkle(twinkleImage, twinkleInterval);
             timeTaskInfoList.Add(new TimeTaskInfo()
-                {timeTaskId = twinkleTimeTask, timeLoopType = TimeTaskList.TimeLoopType.Once, timeTaskName = "图片闪烁"});
+                { timeTaskId = twinkleTimeTask, timeLoopType = TimeTaskList.TimeLoopType.Once, timeTaskName = "图片闪烁" });
             return twinkleTimeTask;
         }
 
-        /// <summary>
-        /// 界面摧毁
-        /// </summary>
-        public virtual void OnViewDestroy()
+       
+        private void RemoveTimeTask()
         {
             for (int i = 0; i < timeTaskInfoList.Count; i++)
             {

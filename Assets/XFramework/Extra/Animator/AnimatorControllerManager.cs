@@ -17,7 +17,7 @@ namespace XFramework
         [LabelText("动画是否切换")] public bool eventChange;
 
         [LabelText("所有动画控制器")] [SerializeField] [Searchable]
-        private List<AnimatorControllerBase> allAnimController = new List<AnimatorControllerBase>();
+        public List<AnimatorControllerBase> allAnimController = new List<AnimatorControllerBase>();
 
         /// <summary>
         /// 动画控制器任务
@@ -27,15 +27,10 @@ namespace XFramework
         public override void StartComponent()
         {
             Instance = GetComponent<AnimatorControllerManager>();
-            // allAnimController = new List<AnimatorControllerBase>(FindObjectsOfType<AnimatorControllerBase>());
-        }
-
-        public override void InitComponent()
-        {
-            allAnimController = DataComponent.GetAllObjectsInScene<AnimatorControllerBase>();
+            allAnimController = DataFrameComponent.GetAllObjectsInScene<AnimatorControllerBase>();
             foreach (AnimatorControllerBase animatorControllerBase in allAnimController)
             {
-                animatorControllerBase.StartComponent();
+                animatorControllerBase.Init();
             }
         }
 
@@ -101,9 +96,17 @@ namespace XFramework
 
             foreach (AnimatorControllerBase controllerBase in allAnimController)
             {
-                if (controllerBase.gameObject.activeInHierarchy)
+                try
                 {
-                    controllerBase.PlayAnim(animType, animSpeedProgress);
+                    if (controllerBase.gameObject.activeInHierarchy)
+                    {
+                        controllerBase.PlayAnim(animType, animSpeedProgress);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(controllerBase.name + e);
+                    throw;
                 }
             }
         }

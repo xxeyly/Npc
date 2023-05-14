@@ -13,9 +13,6 @@ public class YearAttributeConfigurationSceneComponent : SceneComponent
     {
     }
 
-    public override void InitComponent()
-    {
-    }
 
     public override void EndComponent()
     {

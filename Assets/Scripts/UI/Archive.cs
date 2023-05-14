@@ -41,13 +41,13 @@ public class Archive : BaseWindow
     private void OnSaveClick(BaseEventData targetObj)
     {
         Debug.Log("保存数据");
-        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.Save();
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.Save();
     }
 
     private void OnLoadClick(BaseEventData targetObj)
     {
         Debug.Log("读取数据");
-        ListenerComponent.Instance.itemSlotDataSaveSceneComponent.Load();
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.Load();
     }
     //变量方法结束
 

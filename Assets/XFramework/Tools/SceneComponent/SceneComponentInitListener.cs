@@ -1,7 +1,13 @@
+using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using UnityEngine;
+
 namespace XFramework
 {
     public partial class SceneComponentInit
     {
+        [SerializeField] [LabelText("当前监听")] private List<string> callBackName = new List<string>();
+
         #region 增加事件
 
         /// <summary>
@@ -9,9 +15,11 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="unityAction"></param>
-        protected void AddListenerEvent(string eventType, ListenerComponent.CallBack unityAction)
+        protected void AddListenerEvent(string eventType, ListenerFrameComponent.CallBack unityAction)
         {
-            ListenerComponent.Instance.AddListenerEvent(GetType() + "_" + eventType, unityAction);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddListenerEvent(GetType() + "-" + eventType, unityAction);
         }
 
         /// <summary>
@@ -19,9 +27,11 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
-        protected void AddListenerEvent<T>(string eventType, ListenerComponent.CallBack<T> callBack)
+        protected void AddListenerEvent<T>(string eventType, ListenerFrameComponent.CallBack<T> callBack)
         {
-            ListenerComponent.Instance.AddListenerEvent(GetType() + "_" + eventType, callBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         /// <summary>
@@ -29,9 +39,11 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
-        protected void AddListenerEvent<T, X>(string eventType, ListenerComponent.CallBack<T, X> callBack)
+        protected void AddListenerEvent<T, X>(string eventType, ListenerFrameComponent.CallBack<T, X> callBack)
         {
-            ListenerComponent.Instance.AddListenerEvent(GetType() + "_" + eventType, callBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         /// <summary>
@@ -39,9 +51,11 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
-        protected void AddListenerEvent<T, X, Y>(string eventType, ListenerComponent.CallBack<T, X, Y> callBack)
+        protected void AddListenerEvent<T, X, Y>(string eventType, ListenerFrameComponent.CallBack<T, X, Y> callBack)
         {
-            ListenerComponent.Instance.AddListenerEvent(GetType() + "_" + eventType, callBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         /// <summary>
@@ -50,9 +64,11 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
         public void AddListenerEvent<T, X, Y, Z>(string eventType,
-            ListenerComponent.CallBack<T, X, Y, Z> callBack)
+            ListenerFrameComponent.CallBack<T, X, Y, Z> callBack)
         {
-            ListenerComponent.Instance.AddListenerEvent(GetType() + "_" + eventType, callBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         /// <summary>
@@ -61,9 +77,11 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
         public void AddListenerEvent<T, X, Y, Z, W>(string eventType,
-            ListenerComponent.CallBack<T, X, Y, Z, W> callBack)
+            ListenerFrameComponent.CallBack<T, X, Y, Z, W> callBack)
         {
-            ListenerComponent.Instance.AddListenerEvent(GetType() + "_" + eventType, callBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         #endregion
@@ -75,9 +93,9 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="unityAction"></param>
-        protected void RemoveListenerEvent(string eventType, ListenerComponent.CallBack unityAction)
+        protected void RemoveListenerEvent(string eventType, ListenerFrameComponent.CallBack unityAction)
         {
-            ListenerComponent.Instance.RemoveListenerEvent(GetType() + "_" + eventType, unityAction);
+            ListenerFrameComponent.Instance.RemoveListenerEvent(GetType() + "-" + eventType, unityAction);
         }
 
         /// <summary>
@@ -85,9 +103,9 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
-        protected void RemoveListenerEvent<T>(string eventType, ListenerComponent.CallBack<T> callBack)
+        protected void RemoveListenerEvent<T>(string eventType, ListenerFrameComponent.CallBack<T> callBack)
         {
-            ListenerComponent.Instance.RemoveListenerEvent(GetType() + "_" + eventType, callBack);
+            ListenerFrameComponent.Instance.RemoveListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         /// <summary>
@@ -95,9 +113,9 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
-        protected void RemoveListenerEvent<T, X>(string eventType, ListenerComponent.CallBack<T, X> callBack)
+        protected void RemoveListenerEvent<T, X>(string eventType, ListenerFrameComponent.CallBack<T, X> callBack)
         {
-            ListenerComponent.Instance.RemoveListenerEvent(GetType() + "_" + eventType, callBack);
+            ListenerFrameComponent.Instance.RemoveListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         /// <summary>
@@ -105,9 +123,9 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
-        protected void RemoveListenerEvent<T, X, Y>(string eventType, ListenerComponent.CallBack<T, X, Y> callBack)
+        protected void RemoveListenerEvent<T, X, Y>(string eventType, ListenerFrameComponent.CallBack<T, X, Y> callBack)
         {
-            ListenerComponent.Instance.RemoveListenerEvent(GetType() + "_" + eventType, callBack);
+            ListenerFrameComponent.Instance.RemoveListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         /// <summary>
@@ -116,9 +134,9 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
         protected void RemoveListenerEvent<T, X, Y, Z>(string eventType,
-            ListenerComponent.CallBack<T, X, Y, Z> callBack)
+            ListenerFrameComponent.CallBack<T, X, Y, Z> callBack)
         {
-            ListenerComponent.Instance.RemoveListenerEvent(GetType() + "_" + eventType, callBack);
+            ListenerFrameComponent.Instance.RemoveListenerEvent(GetType() + "-" + eventType, callBack);
         }
 
         /// <summary>
@@ -127,9 +145,27 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="callBack"></param>
         protected void RemoveListenerEvent<T, X, Y, Z, W>(string eventType,
-            ListenerComponent.CallBack<T, X, Y, Z, W> callBack)
+            ListenerFrameComponent.CallBack<T, X, Y, Z, W> callBack)
         {
-            ListenerComponent.Instance.RemoveListenerEvent(GetType() + "_" + eventType, callBack);
+            ListenerFrameComponent.Instance.RemoveListenerEvent(GetType() + "-" + eventType, callBack);
+        }
+
+        /// <summary>
+        /// 移除事件监听
+        /// </summary>
+        protected void RemoveListenerEvent(string eventType)
+        {
+            ListenerFrameComponent.Instance.RemoveDelegateToListenerEvent(eventType);
+        }
+
+        public void RemoveAllListenerEvent()
+        {
+            //有事件监听的才移除
+            if (callBackName.Count > 0)
+            {
+                callBackName.Clear();
+                RemoveListenerEvent(GetType().ToString());
+            }
         }
 
         #endregion
@@ -141,9 +177,11 @@ namespace XFramework
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="returnCallBack"></param>
-        protected void AddReturnListenerEvent<R>(string eventType, ListenerComponent.ReturnCallBack<R> returnCallBack)
+        protected void AddReturnListenerEvent<R>(string eventType, ListenerFrameComponent.ReturnCallBack<R> returnCallBack)
         {
-            ListenerComponent.Instance.AddReturnListenerEvent(GetType() + "_" + eventType, returnCallBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddReturnListenerEvent(GetType() + "-" + eventType, returnCallBack);
         }
 
         /// <summary>
@@ -152,9 +190,11 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="returnCallBack"></param>
         protected void AddReturnListenerEvent<T, R>(string eventType,
-            ListenerComponent.ReturnCallBack<T, R> returnCallBack)
+            ListenerFrameComponent.ReturnCallBack<T, R> returnCallBack)
         {
-            ListenerComponent.Instance.AddReturnListenerEvent(GetType() + "_" + eventType, returnCallBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddReturnListenerEvent(GetType() + "-" + eventType, returnCallBack);
         }
 
         /// <summary>
@@ -163,9 +203,11 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="returnCallBack"></param>
         protected void AddReturnListenerEvent<T, X, R>(string eventType,
-            ListenerComponent.ReturnCallBack<T, X, R> returnCallBack)
+            ListenerFrameComponent.ReturnCallBack<T, X, R> returnCallBack)
         {
-            ListenerComponent.Instance.AddReturnListenerEvent(GetType() + "_" + eventType, returnCallBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddReturnListenerEvent(GetType() + "-" + eventType, returnCallBack);
         }
 
         /// <summary>
@@ -174,9 +216,11 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="returnCallBack"></param>
         protected void AddReturnListenerEvent<T, X, Y, R>(string eventType,
-            ListenerComponent.ReturnCallBack<T, X, Y, R> returnCallBack)
+            ListenerFrameComponent.ReturnCallBack<T, X, Y, R> returnCallBack)
         {
-            ListenerComponent.Instance.AddReturnListenerEvent(GetType() + "_" + eventType, returnCallBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddReturnListenerEvent(GetType() + "-" + eventType, returnCallBack);
         }
 
         /// <summary>
@@ -185,9 +229,11 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="returnCallBack"></param>
         protected void AddReturnListenerEvent<T, X, Y, Z, R>(string eventType,
-            ListenerComponent.ReturnCallBack<T, X, Y, Z, R> returnCallBack)
+            ListenerFrameComponent.ReturnCallBack<T, X, Y, Z, R> returnCallBack)
         {
-            ListenerComponent.Instance.AddReturnListenerEvent(GetType() + "_" + eventType, returnCallBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddReturnListenerEvent(GetType() + "-" + eventType, returnCallBack);
         }
 
         /// <summary>
@@ -196,9 +242,11 @@ namespace XFramework
         /// <param name="eventType"></param>
         /// <param name="returnCallBack"></param>
         protected void AddReturnListenerEvent<T, X, Y, Z, W, R>(string eventType,
-            ListenerComponent.ReturnCallBack<T, X, Y, Z, W, R> returnCallBack)
+            ListenerFrameComponent.ReturnCallBack<T, X, Y, Z, W, R> returnCallBack)
         {
-            ListenerComponent.Instance.AddReturnListenerEvent(GetType() + "_" + eventType, returnCallBack);
+            callBackName.Add(GetType() + "-" + eventType);
+
+            ListenerFrameComponent.Instance.AddReturnListenerEvent(GetType() + "-" + eventType, returnCallBack);
         }
 
         #endregion

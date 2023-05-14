@@ -13,22 +13,8 @@ namespace XFramework
     {
         public static ViewFrameComponent Instance;
 
-        /// <summary>
-        /// 所有的视图窗口
-        /// </summary>
-        [LabelText("所有的视图窗口")] [SerializeField] [Searchable]
-        private List<BaseWindow> allViewWind;
-
-
-        /// <summary>
-        /// 视图类型与视图窗口的键值对
-        /// </summary>
-        private Dictionary<Type, BaseWindow> _activeViewDlc = new Dictionary<Type, BaseWindow>();
-
-        /// <summary>
-        /// 所有活动的视图
-        /// </summary>
-        [LabelText("所有活动的视图")] private List<Type> _allActiveView = new List<Type>();
+        [LabelText("视图类型与视图窗口的键值对")] [SerializeField]
+        public Dictionary<Type, BaseWindow> activeViewDlc = new Dictionary<Type, BaseWindow>();
 
         /// <summary>
         /// 视图计时任务ID
@@ -52,27 +38,57 @@ namespace XFramework
 
         public override void FrameSceneInitComponent()
         {
-            List<BaseWindow> tempSceneBaseWindow = DataComponent.GetAllObjectsInScene<BaseWindow>();
-            allViewWind = new List<BaseWindow>();
-            for (int i = 0; i < tempSceneBaseWindow.Count; i++)
+            List<BaseWindow> tempSceneBaseWindow = DataFrameComponent.GetAllObjectsInScene<BaseWindow>(GameRootStart.Instance.loadScene.name);
+
+            foreach (BaseWindow window in tempSceneBaseWindow)
             {
-                if (!tempSceneBaseWindow[i].GetComponent<ChildBaseWindow>())
+                if (!window.GetComponent<ChildBaseWindow>() && !activeViewDlc.ContainsKey(window.viewType))
                 {
-                    allViewWind.Add(tempSceneBaseWindow[i]);
+                    activeViewDlc.Add(window.viewType, window);
+                    // Debug.Log(window.viewType + "初始化");
+                    window.ViewStartInit();
                 }
             }
+            // ResetSetSiblingIndex();
+        }
 
-            _activeViewDlc = new Dictionary<Type, BaseWindow>();
-            _allActiveView = new List<Type>();
-            AddView();
-            foreach (BaseWindow window in allViewWind)
+        public void RemoveView(Type viewType)
+        {
+            if (activeViewDlc.ContainsKey(viewType))
             {
-                window.ViewStartInit();
+                activeViewDlc.Remove(viewType);
+            }
+        }
+
+        [Button("重置层级关系")]
+        public void ResetSetSiblingIndex()
+        {
+            foreach (KeyValuePair<Type, BaseWindow> window in activeViewDlc)
+            {
+                window.Value.SetSetSiblingIndex();
             }
         }
 
         public override void FrameEndComponent()
         {
+        }
+
+        public GameObject Instantiate(GameObject instantiate, Transform parent, bool world)
+        {
+            GameObject tempInstantiate = GameObject.Instantiate(instantiate, parent, world);
+            InstantiateInit(tempInstantiate);
+
+            return tempInstantiate;
+        }
+
+        private void InstantiateInit(GameObject instantiate)
+        {
+            BaseWindow baseWindow = instantiate.GetComponent<BaseWindow>();
+            if (!activeViewDlc.ContainsKey(baseWindow.viewType))
+            {
+                activeViewDlc.Add(baseWindow.viewType, baseWindow);
+                baseWindow.ViewStartInit();
+            }
         }
 
         /// <summary>
@@ -81,7 +97,7 @@ namespace XFramework
         /// <returns></returns>
         private bool GetViewExistence(Type view)
         {
-            if (_activeViewDlc != null && _activeViewDlc.ContainsKey(view))
+            if (activeViewDlc != null && activeViewDlc.ContainsKey(view))
             {
                 return true;
             }
@@ -96,30 +112,12 @@ namespace XFramework
         /// <returns></returns>
         public bool GetViewState(Type view)
         {
-            if (_activeViewDlc != null && _activeViewDlc.ContainsKey(view))
+            if (activeViewDlc != null && activeViewDlc.ContainsKey(view))
             {
-                return _activeViewDlc[view].GetDisplay();
+                return activeViewDlc[view].GetDisplay();
             }
 
             return false;
-        }
-
-        public bool AddView(BaseWindow addView)
-        {
-            if (allViewWind.Contains(addView) || addView.viewType == typeof(ChildBaseWindow))
-            {
-                return false;
-            }
-
-            allViewWind.Add(addView);
-            if (!_activeViewDlc.ContainsKey(addView.viewType))
-            {
-                _activeViewDlc.Add(addView.viewType, addView);
-            }
-
-            addView.ViewStartInit();
-
-            return true;
         }
 
         /// <summary>
@@ -127,7 +125,7 @@ namespace XFramework
         /// </summary>
         public void AllViewWindInit()
         {
-            foreach (KeyValuePair<Type, BaseWindow> pair in _activeViewDlc)
+            foreach (KeyValuePair<Type, BaseWindow> pair in activeViewDlc)
             {
                 pair.Value.GetComponent<BaseWindow>().Init();
             }
@@ -140,7 +138,7 @@ namespace XFramework
         public int GetCurrentActiveViewCount()
         {
             int currentActiveViewCount = 0;
-            return _allActiveView.Count - currentActiveViewCount;
+            return activeViewDlc.Count - currentActiveViewCount;
         }
 
         /// <summary>
@@ -148,25 +146,7 @@ namespace XFramework
         /// </summary>
         public int GetCurrentSceneViewCount()
         {
-            return allViewWind.Count;
-        }
-
-        /// <summary>
-        /// 添加视图类型,视图类型不为Normal的都添加到视图键值对中
-        /// </summary>
-        private void AddView()
-        {
-            foreach (BaseWindow baseWindow in allViewWind)
-            {
-                if (!_activeViewDlc.ContainsKey(baseWindow.viewType))
-                {
-                    _activeViewDlc.Add(baseWindow.viewType, baseWindow);
-                }
-                else
-                {
-                    Debug.LogError("当前视图:" + baseWindow.viewType + "场景中存在多个");
-                }
-            }
+            return activeViewDlc.Count;
         }
 
         /// <summary>
@@ -174,9 +154,7 @@ namespace XFramework
         /// </summary>
         public void DeleteAllView()
         {
-            allViewWind.Clear();
-            _activeViewDlc.Clear();
-            _allActiveView.Clear();
+            activeViewDlc.Clear();
         }
 
         #region 显示视图
@@ -187,12 +165,8 @@ namespace XFramework
         /// <param name="type"></param>
         public void ShowView(Type type)
         {
-            _activeViewDlc[type].DisPlay(true);
-            _activeViewDlc[type].Init();
-            if (!_allActiveView.Contains(type))
-            {
-                _allActiveView.Add(type);
-            }
+            activeViewDlc[type].DisPlay(true);
+            activeViewDlc[type].Init();
         }
 
         /// <summary>
@@ -234,7 +208,7 @@ namespace XFramework
         /// </summary>
         public void AblationView(Type viewType)
         {
-            _activeViewDlc[viewType].DisPlay(true);
+            activeViewDlc[viewType].DisPlay(true);
         }
 
         #endregion
@@ -247,12 +221,11 @@ namespace XFramework
         /// <param name="type"></param>
         public void HideView(Type type)
         {
-            BaseWindow baseWindow = _activeViewDlc[type];
+            BaseWindow baseWindow = activeViewDlc[type];
             if (GetViewState(type))
             {
-                baseWindow.OnViewDestroy();
+                baseWindow.OnViewHide();
                 baseWindow.DisPlay(false);
-                _allActiveView.Remove(type);
             }
         }
 
@@ -292,7 +265,7 @@ namespace XFramework
 
         public void HideAllView()
         {
-            foreach (KeyValuePair<Type, BaseWindow> pair in _activeViewDlc)
+            foreach (KeyValuePair<Type, BaseWindow> pair in activeViewDlc)
             {
                 if (pair.Value.GetViewShowType() == ViewShowType.Activity)
                 {
@@ -306,7 +279,7 @@ namespace XFramework
         /// </summary>
         public void FrozenView(Type viewType)
         {
-            _activeViewDlc[viewType].DisPlay(false);
+            activeViewDlc[viewType].DisPlay(false);
         }
 
         #endregion
@@ -338,11 +311,17 @@ namespace XFramework
         /// <summary>
         /// 所有视图的隐藏摧毁任务
         /// </summary>
-        public void AllViewDestroy()
+        public void AllViewDestroy(string destroySceneName)
         {
-            foreach (BaseWindow window in allViewWind)
+            List<BaseWindow> allWindows = DataFrameComponent.GetAllObjectsInScene<BaseWindow>(destroySceneName);
+            foreach (BaseWindow window in allWindows)
             {
-                window.OnViewDestroy();
+                //移除视图
+                if (!window.GetComponent<ChildBaseWindow>() && activeViewDlc.ContainsKey(window.viewType))
+                {
+                    activeViewDlc.Remove(window.viewType);
+                    window.OnViewDestroy();
+                }
             }
         }
     }

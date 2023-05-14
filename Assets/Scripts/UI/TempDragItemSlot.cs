@@ -115,7 +115,7 @@ public class TempDragItemSlot : BaseWindow
     private void UpdateItemUp()
     {
         _itemIcon.sprite = _dragItem.ItemIcon;
-        if (ListenerComponent.Instance.atlasSceneComponent.GetItemUnlocking(_dragItem))
+        if (ListenerFrameComponent.Instance.atlasSceneComponent.GetItemUnlocking(_dragItem))
         {
             _content.text = _dragItem.ItemName;
         }

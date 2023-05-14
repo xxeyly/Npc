@@ -14,22 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSlotSaveData:
   - itemSlotIndex: 0
-    itemId: 0
+    itemId: 1
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: 5bc3c311b66873d40bb7c9af6a8dd893, type: 2}
+      value: 0
+  - itemSlotIndex: 1
+    itemId: 2
+    attributeValueList:
+    - attribute: {fileID: 11400000, guid: a3e723bc6e646eb4a86aed62a5ab10fb, type: 2}
+      value: 200
+  - itemSlotIndex: 22
+    itemId: 3
     attributeValueList:
     - attribute: {fileID: 11400000, guid: c03ed93f5ef0f6e40b60c8e44788bdf8, type: 2}
-      value: 200
-  - itemSlotIndex: 3
-    itemId: 0
-    attributeValueList:
-    - attribute: {fileID: 11400000, guid: cb474d3a538495b40b10b246896b8b2b, type: 2}
-      value: 200
-  - itemSlotIndex: 4
-    itemId: 0
-    attributeValueList:
-    - attribute: {fileID: 11400000, guid: c03ed93f5ef0f6e40b60c8e44788bdf8, type: 2}
-      value: 200
-  - itemSlotIndex: 5
-    itemId: 0
-    attributeValueList:
-    - attribute: {fileID: 11400000, guid: 98bb133a16102d84c9e6c482db79546a, type: 2}
-      value: 200
+      value: 0

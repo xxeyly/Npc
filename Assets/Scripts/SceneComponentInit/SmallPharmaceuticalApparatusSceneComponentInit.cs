@@ -6,6 +6,6 @@ public class SmallPharmaceuticalApparatusSceneComponentInit : SceneComponentInit
 {
     public override void InitComponent()
     {
-        ListenerComponent.Instance.smallPharmaceuticalApparatus.InitStorageItem();
+        ListenerFrameComponent.Instance.smallPharmaceuticalApparatus.InitStorageItem();
     }
 }

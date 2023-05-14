@@ -43,20 +43,22 @@ namespace XFramework
         [BoxGroup("标签/属性")] [LabelText("显示时间")] [Range(0.1f, 9)] [SerializeField] /*[ShowIf("showType", ShowType.Curve)]*/[EnableIf("showType", ShowType.Curve)]
         protected float showTime = 1;
 
+        [BoxGroup("标签/属性")] [LabelText("UI层级")] [SerializeField] [EnumToggleButtons] [LabelWidth(50)]
+        public int layerIndex = 0;
+
         [BoxGroup("调试")] [ToggleLeft] [GUIColor(0.3f, 0.8f, 0.8f, 1f)] [LabelText("日志输出")]
         public bool isLog;
 
         [BoxGroup("调试")] [TableList(AlwaysExpanded = true, DrawScrollView = false)] [Searchable] [SerializeField] [LabelText("计时任务列表")]
         protected List<TimeTaskInfo> timeTaskInfoList = new List<TimeTaskInfo>();
 
-        [HideInInspector] public Type viewType;
+        public Type viewType;
 
         [BoxGroup("标签/命名")] [GUIColor(0.3f, 0.8f, 0.8f, 1f)] [LabelText("视图名称")] [LabelWidth(50)]
         public string viewName;
 
         [BoxGroup("标签/命名")] [GUIColor(0.3f, 0.8f, 0.8f, 1f)] [LabelText("类名称")] [LabelWidth(50)]
         public string typeName;
-
         [BoxGroup("标签/命名")]
         [Button(ButtonSizes.Medium)]
         [LabelText("重命名")]
@@ -80,11 +82,6 @@ namespace XFramework
             InitViewShowType();
         }
 
-        public bool AddView()
-        {
-            return ViewFrameComponent.Instance.AddView(this);
-        }
-
         /// <summary>
         /// 返回当前视图的活动类型
         /// </summary>
@@ -93,6 +90,8 @@ namespace XFramework
         {
             return viewShowType;
         }
+
+        
 
         /// <summary>
         /// 视图初始化
@@ -104,6 +103,11 @@ namespace XFramework
             InitView();
             InitListener();
             OnlyOnceInit();
+        }
+
+        public void SetSetSiblingIndex()
+        {
+            transform.SetSiblingIndex(layerIndex);
         }
 
 
@@ -159,6 +163,8 @@ namespace XFramework
         {
             ViewFrameComponent.Instance.ShowView(viewType);
         }
+
+       
 
         /// <summary>
         /// 获得当前视图的显示状态

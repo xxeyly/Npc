@@ -7,6 +7,6 @@ public class PersonalBelongingsSceneComponentInit : SceneComponentInit
 {
     public override void InitComponent()
     {
-        ListenerComponent.Instance.personalBelongings.InitStorageItem();
+        ListenerFrameComponent.Instance.personalBelongings.InitStorageItem();
     }
 }

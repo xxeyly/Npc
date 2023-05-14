@@ -5,7 +5,7 @@ namespace XFramework
 {
     public abstract partial class SceneComponentInit : MonoBehaviour, ISceneComponent
     {
-        public void StartComponent()
+        public virtual void StartComponent()
         {
         }
 
