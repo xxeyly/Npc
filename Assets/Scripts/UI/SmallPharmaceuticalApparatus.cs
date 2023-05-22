@@ -228,7 +228,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         AttributeValue waterAttribute = null;
         foreach (AttributeValue attributeValue in _waterTank.item.attributeValueList)
         {
-            if (attributeValue.attribute.GetType() == typeof(WaterAttribute))
+            if (attributeValue.baseAttribute.GetType() == typeof(WaterBaseAttribute))
             {
                 waterAttribute = attributeValue;
             }
@@ -349,9 +349,9 @@ public class SmallPharmaceuticalApparatus : BaseWindow
     }
 
     [LabelText("获得容器内所有属性,0除外")]
-    private List<Attribute> GetAllContainerAttribute()
+    private List<BaseAttribute> GetAllContainerAttribute()
     {
-        List<Attribute> attributes = new List<Attribute>();
+        List<BaseAttribute> attributes = new List<BaseAttribute>();
 
         foreach (ItemSlot itemSlot in _itemSlotContent)
         {
@@ -363,9 +363,9 @@ public class SmallPharmaceuticalApparatus : BaseWindow
             foreach (AttributeValue attributeValue in itemSlot.item.attributeValueList)
             {
                 //没有包含当前属性,并且属性有值
-                if (!attributes.Contains(attributeValue.attribute) && attributeValue.value > 0)
+                if (!attributes.Contains(attributeValue.baseAttribute) && attributeValue.value > 0)
                 {
-                    attributes.Add(attributeValue.attribute);
+                    attributes.Add(attributeValue.baseAttribute);
                 }
             }
         }
@@ -462,7 +462,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
                 foreach (AttributeValue attributeValue in itemSlot.item.attributeValueList)
                 {
-                    if (attributeValue.attribute.attributeId == attributeCompositionProportion.attribute.attributeId)
+                    if (attributeValue.baseAttribute.attributeId == attributeCompositionProportion.baseAttribute.attributeId)
                     {
                         currentValue += attributeValue.value;
                     }
@@ -498,7 +498,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
                 foreach (AttributeValue attributeValue in itemSlot.item.attributeValueList)
                 {
                     //找到属性一样的
-                    if (attributeCompositionProportion.attribute.attributeId == attributeValue.attribute.attributeId)
+                    if (attributeCompositionProportion.baseAttribute.attributeId == attributeValue.baseAttribute.attributeId)
                     {
                         if (needValue <= attributeValue.value)
                         {
@@ -529,7 +529,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         foreach (AttributeValue attributeValue in _produce.item.attributeValueList)
         {
             //容量属性不能计算
-            if (attributeValue.attribute.GetAttributeType() != typeof(CapacityAttribute))
+            if (attributeValue.baseAttribute.GetAttributeType() != typeof(CapacityBaseAttribute))
             {
                 currentValue += attributeValue.value;
             }
@@ -548,7 +548,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         {
             _produce.item.AddAttributeValue(new AttributeValue()
             {
-                attribute = attributeComposition.finalAttribute,
+                baseAttribute = attributeComposition.finalBaseAttribute,
                 value = outputValue
             });
         }
@@ -556,12 +556,12 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         {
             _produce.item.AddAttributeValue(new AttributeValue()
             {
-                attribute = attributeComposition.finalAttribute,
+                baseAttribute = attributeComposition.finalBaseAttribute,
                 value = remainingCapacity
             });
         }
     }
-
+    [AddListenerEvent]
     private void InitStorageItem()
     {
         ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataSaveEvent(Save);

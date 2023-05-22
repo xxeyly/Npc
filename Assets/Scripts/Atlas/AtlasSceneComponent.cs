@@ -26,7 +26,8 @@ public class AtlasSceneComponent : SceneComponent
             return;
         }
 
-        UnityEditor.AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<ItemAtlas>(), General.assetRootPath + "ItemAtlas.asset");
+        UnityEditor.AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<ItemAtlas>(),
+            General.assetRootPath + "ItemAtlas.asset");
         UnityEditor.AssetDatabase.SaveAssets();
         UnityEditor.AssetDatabase.Refresh();
         itemAtlas = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemAtlas>(General.assetRootPath + "ItemAtlas.asset");
@@ -35,61 +36,63 @@ public class AtlasSceneComponent : SceneComponent
     [Button("创建属性")]
     public void CreateAttribute()
     {
-        List<Attribute> attributes = DataFrameComponent.GetInheritAllSubclass<Attribute>();
-        foreach (Attribute attribute in attributes)
+        List<BaseAttribute> attributes = DataFrameComponent.GetInheritAllSubclass<BaseAttribute>();
+        foreach (BaseAttribute attribute in attributes)
         {
             switch (attribute)
             {
-                case CapacityAttribute capacityAttribute:
-                    CreateAttribute<CapacityAttribute>("容量");
+                case CapacityBaseAttribute capacityAttribute:
+                    CreateAttribute<CapacityBaseAttribute>("容量");
                     break;
-                case EarthEnergyAttribute earthEnergyAttribute:
-                    CreateAttribute<EarthEnergyAttribute>("土能量");
+                case EarthEnergyBaseAttribute earthEnergyAttribute:
+                    CreateAttribute<EarthEnergyBaseAttribute>("土能量");
                     break;
-                case EnergyAttribute energyAttribute:
-                    CreateAttribute<EnergyAttribute>("能量");
+                case EnergyBaseAttribute energyAttribute:
+                    CreateAttribute<EnergyBaseAttribute>("能量");
                     break;
-                case FireAttribute fireAttribute:
-                    CreateAttribute<FireAttribute>("火");
+                case FireBaseAttribute fireAttribute:
+                    CreateAttribute<FireBaseAttribute>("火");
                     break;
-                case FireEnergyAttribute fireEnergyAttribute:
-                    CreateAttribute<FireEnergyAttribute>("火能量");
+                case FireEnergyBaseAttribute fireEnergyAttribute:
+                    CreateAttribute<FireEnergyBaseAttribute>("火能量");
                     break;
-                case HealthyAttribute healthyAttribute:
-                    CreateAttribute<HealthyAttribute>("健康");
+                case HealthyBaseAttribute healthyAttribute:
+                    CreateAttribute<HealthyBaseAttribute>("健康");
                     break;
-                case MetalEnergyAttribute metalEnergyAttribute:
-                    CreateAttribute<MetalEnergyAttribute>("金能量");
+                case MetalEnergyBaseAttribute metalEnergyAttribute:
+                    CreateAttribute<MetalEnergyBaseAttribute>("金能量");
                     break;
-                case ParticularYearAttribute particularYearAttribute:
-                    CreateAttribute<ParticularYearAttribute>("年份");
+                case ParticularYearBaseAttribute particularYearAttribute:
+                    CreateAttribute<ParticularYearBaseAttribute>("年份");
                     break;
-                case WaterAttribute waterAttribute:
-                    CreateAttribute<WaterAttribute>("水");
+                case WaterBaseAttribute waterAttribute:
+                    CreateAttribute<WaterBaseAttribute>("水");
                     break;
-                case WaterEnergyAttribute waterEnergyAttribute:
-                    CreateAttribute<WaterEnergyAttribute>("水能量");
+                case WaterEnergyBaseAttribute waterEnergyAttribute:
+                    CreateAttribute<WaterEnergyBaseAttribute>("水能量");
                     break;
-                case WoodEnergyAttribute woodEnergyAttribute:
-                    CreateAttribute<WoodEnergyAttribute>("木能量");
+                case WoodEnergyBaseAttribute woodEnergyAttribute:
+                    CreateAttribute<WoodEnergyBaseAttribute>("木能量");
                     break;
             }
         }
     }
 
-    private void CreateAttribute<T>(string attributeName) where T : Attribute
+    private void CreateAttribute<T>(string attributeName) where T : BaseAttribute
     {
-        if (UnityEditor.AssetDatabase.LoadAssetAtPath<T>(General.assetRootPath + "Attribute/" + attributeName + ".asset") != null)
+        if (UnityEditor.AssetDatabase.LoadAssetAtPath<T>(
+                General.assetRootPath + "Attribute/" + attributeName + ".asset") != null)
         {
             return;
         }
 
-        UnityEditor.AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<T>(), General.assetRootPath + "Attribute/" + attributeName + ".asset");
+        UnityEditor.AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<T>(),
+            General.assetRootPath + "Attribute/" + attributeName + ".asset");
         UnityEditor.AssetDatabase.SaveAssets();
         UnityEditor.AssetDatabase.Refresh();
     }
 
-
+    [AddListenerEvent]
     private Item CreateItemByItemId(int itemId)
     {
         Item item = null;
@@ -106,7 +109,8 @@ public class AtlasSceneComponent : SceneComponent
 
     [BoxGroup]
     [Button("创建物品")]
-    public void CreateItem(string itemScriptableObjectName, string itemName, string describe, Sprite itemIcon, List<AttributeValue> itemAttribute)
+    public void CreateItem(string itemScriptableObjectName, string itemName, string describe, Sprite itemIcon,
+        List<AttributeValue> itemAttribute)
     {
         Item item = ScriptableObject.CreateInstance<Item>();
         item.ItemId = GetItemNotRepeatId();
@@ -115,14 +119,18 @@ public class AtlasSceneComponent : SceneComponent
         item.ItemIcon = itemIcon;
         item.attributeValueList = itemAttribute;
         //创建新的物品
-        if (UnityEditor.AssetDatabase.LoadAssetAtPath<Item>(General.assetRootPath + "Item/" + itemScriptableObjectName + ".asset") == null)
+        if (UnityEditor.AssetDatabase.LoadAssetAtPath<Item>(General.assetRootPath + "Item/" + itemScriptableObjectName +
+                                                            ".asset") == null)
         {
-            UnityEditor.AssetDatabase.CreateAsset(item, General.assetRootPath + "Item/" + itemScriptableObjectName + ".asset");
+            UnityEditor.AssetDatabase.CreateAsset(item,
+                General.assetRootPath + "Item/" + itemScriptableObjectName + ".asset");
             UnityEditor.AssetDatabase.SaveAssets();
             UnityEditor.AssetDatabase.Refresh();
         }
 
-        itemAtlas.Items.Add(UnityEditor.AssetDatabase.LoadAssetAtPath<Item>(General.assetRootPath + "Item/" + itemScriptableObjectName + ".asset"));
+        itemAtlas.Items.Add(
+            UnityEditor.AssetDatabase.LoadAssetAtPath<Item>(General.assetRootPath + "Item/" + itemScriptableObjectName +
+                                                            ".asset"));
     }
 
     //获得物品物品列表不重复Id
@@ -152,16 +160,19 @@ public class AtlasSceneComponent : SceneComponent
     {
     }
 
+    [AddListenerEvent]
     private bool GetItemUnlocking(Item item)
     {
         return unlockingItem.Contains(item);
     }
 
+    [AddListenerEvent]
     private ItemAtlas GetItemAtlas()
     {
         return itemAtlas;
     }
 
+    [AddListenerEvent]
     private List<Item> GetUnlockingItem()
     {
         return unlockingItem;

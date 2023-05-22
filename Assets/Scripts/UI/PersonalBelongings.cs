@@ -101,7 +101,7 @@ public class PersonalBelongings : BaseWindow
             window.transform.position = Input.mousePosition + _moveOffset;
         }
     }
-
+    [AddListenerEvent]
     private void InitStorageItem()
     {
         ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataSaveEvent(Save);
@@ -125,7 +125,7 @@ public class PersonalBelongings : BaseWindow
         _currentCount.text = _currentItemCount.ToString();
     }
 
-    [Button]
+    [Button][AddListenerEvent]
     private bool AddItem(Item item)
     {
         item = item.GetNewItem();
@@ -159,13 +159,13 @@ public class PersonalBelongings : BaseWindow
     }
 
 
-    [LabelText("设置拖拽物品格子")]
+    [LabelText("设置拖拽物品格子")][AddListenerEvent]
     private void SetDragItemSlot(ItemSlot itemSlot)
     {
         ListenerFrameComponent.Instance.tempDragItemSlot.SetDragItemSlot(itemSlot);
     }
 
-    [LabelText("移除拖拽物品格子")]
+    [LabelText("移除拖拽物品格子")][AddListenerEvent]
     private void RemoveDragItemSlot()
     {
         ListenerFrameComponent.Instance.tempDragItemSlot.RemoveDragItemSlot();

@@ -2,7 +2,9 @@
 
 using UnityEngine.UI;
 using TMPro;
+
 #endregion 引入
+
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -13,6 +15,7 @@ using XFramework;
 public class ItemAttributeShow : BaseWindow
 {
     #region 变量声明
+
     private GameObject _attributePanel;
     private Image _itemIcon;
     private TextMeshProUGUI _itemName;
@@ -22,6 +25,7 @@ public class ItemAttributeShow : BaseWindow
     private GameObject _itemAttributeShowItemPanel;
 
     #endregion 变量声明
+
     private RectTransform _attributePanelRect;
     private RectTransform _describeRect;
     private RectTransform _attributeTitleRect;
@@ -32,7 +36,10 @@ public class ItemAttributeShow : BaseWindow
     [LabelText("描述和属性标题的间距")] public float describeSpacingAttributeTitle;
     [LabelText("属性和属性类表的间距")] public float attributeTitleSpacingItemAttributeShowItemPanel;
     [LabelText("属性预制体")] public GameObject itemAttributeShowItemPrefab;
-    [LabelText("预制体列表")] private List<ItemAttributeShowItem> _itemAttributeShowItems = new List<ItemAttributeShowItem>();
+
+    [LabelText("预制体列表")]
+    private List<ItemAttributeShowItem> _itemAttributeShowItems = new List<ItemAttributeShowItem>();
+
     private Transform _itemAttributeShowItemContent;
     [LabelText("刷新布局")] private bool _refreshLayout;
     private Vector2 _itemPos;
@@ -46,14 +53,17 @@ public class ItemAttributeShow : BaseWindow
 
     protected override void InitView()
     {
-       #region 变量查找
+        #region 变量查找
+
         BindUi(ref _attributePanel, "AttributePanel");
         BindUi(ref _itemIcon, "AttributePanel/SelectedFrame/ItemIcon");
         BindUi(ref _itemName, "AttributePanel/ItemName");
         BindUi(ref _describe, "AttributePanel/Describe");
         BindUi(ref _attributeTitle, "AttributePanel/AttributeTitle");
         BindUi(ref _itemAttributeShowItemPanel, "AttributePanel/ItemAttributeShowItemPanel");
+
         #endregion 变量查找
+
         BindUi(ref _itemAttributeShowItemContent, "AttributePanel/ItemAttributeShowItemPanel");
         BindUi(ref _attributePanelRect, "AttributePanel");
         BindUi(ref _describeRect, "AttributePanel/Describe");
@@ -66,6 +76,7 @@ public class ItemAttributeShow : BaseWindow
         #region 变量绑定
 
         #endregion 变量绑定
+
         AddListenerEvent<Item, Vector3>("ShowItemAttribute", ShowItemAttribute);
         AddListenerEvent("HideItemAttribute", HideItemAttribute);
         AddListenerEvent<bool>("SetWindowDrag", SetWindowDrag);
@@ -78,11 +89,14 @@ public class ItemAttributeShow : BaseWindow
     #region 自定义属性
 
     #endregion 自定义属性
+
+    [AddListenerEvent]
     private void SetWindowDrag(bool value)
     {
         _windowDrag = value;
     }
 
+    [AddListenerEvent]
     private void ShowItemAttribute(Item item, Vector3 itemPos)
     {
         if (_windowDrag)
@@ -102,10 +116,13 @@ public class ItemAttributeShow : BaseWindow
 
         for (int i = 0; i < item.attributeValueList.Count; i++)
         {
-            GameObject itemAttributeShowItemObj = Instantiate(itemAttributeShowItemPrefab, _itemAttributeShowItemContent);
-            ItemAttributeShowItem itemAttributeShowItem = itemAttributeShowItemObj.GetComponent<ItemAttributeShowItem>();
+            GameObject itemAttributeShowItemObj =
+                Instantiate(itemAttributeShowItemPrefab, _itemAttributeShowItemContent);
+            ItemAttributeShowItem itemAttributeShowItem =
+                itemAttributeShowItemObj.GetComponent<ItemAttributeShowItem>();
             itemAttributeShowItem.ViewStartInit();
-            itemAttributeShowItem.InitAttribute(item.attributeValueList[i].attribute, item.attributeValueList[i].value);
+            itemAttributeShowItem.InitAttribute(item.attributeValueList[i].baseAttribute,
+                item.attributeValueList[i].value);
             _itemAttributeShowItems.Add(itemAttributeShowItem);
         }
 
@@ -132,16 +149,20 @@ public class ItemAttributeShow : BaseWindow
         }
 
         //描述的位置+描述的高+描述和属性标题的间距
-        _attributeTitleRect.anchoredPosition = new Vector3(0, _describeRect.anchoredPosition.y - (_describeRect.sizeDelta.y + describeSpacingAttributeTitle));
+        _attributeTitleRect.anchoredPosition = new Vector3(0,
+            _describeRect.anchoredPosition.y - (_describeRect.sizeDelta.y + describeSpacingAttributeTitle));
         //属性标题的位置+属性标题的宽+属性标题和属性列表的间距
-        _itemAttributeShowItemPanelRect.anchoredPosition = new Vector3(0, _attributeTitleRect.anchoredPosition.y - (60 + attributeTitleSpacingItemAttributeShowItemPanel));
+        _itemAttributeShowItemPanelRect.anchoredPosition = new Vector3(0,
+            _attributeTitleRect.anchoredPosition.y - (60 + attributeTitleSpacingItemAttributeShowItemPanel));
         _itemAttributeShowItemPanelRect.sizeDelta = new Vector2(500, _itemAttributeShowItems.Count * 60);
 
-        float size = itemIconSize + itemIconSSpacingDescribe + _describeRect.sizeDelta.y + describeSpacingAttributeTitle + 60 + attributeTitleSpacingItemAttributeShowItemPanel + _itemAttributeShowItemPanelRect.sizeDelta.y;
+        float size = itemIconSize + itemIconSSpacingDescribe + _describeRect.sizeDelta.y +
+                     describeSpacingAttributeTitle + 60 + attributeTitleSpacingItemAttributeShowItemPanel +
+                     _itemAttributeShowItemPanelRect.sizeDelta.y;
         _attributePanelRect.sizeDelta = new Vector2(500, size);
     }
 
-
+    [AddListenerEvent]
     private void HideItemAttribute()
     {
         _attributePanel.GetComponent<CanvasGroup>().alpha = 0;

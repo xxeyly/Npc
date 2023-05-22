@@ -35,8 +35,8 @@ public class ItemAttributeShowItem : ChildBaseWindow
     #region 变量方法
 
     #endregion 变量方法
-    public void InitAttribute(Attribute attribute, int attributeValue)
+    public void InitAttribute(BaseAttribute baseAttribute, int attributeValue)
     {
-        _content.text = attribute.AttributeName + ":" + attributeValue;
+        _content.text = baseAttribute.AttributeName + ":" + attributeValue;
     }
 }

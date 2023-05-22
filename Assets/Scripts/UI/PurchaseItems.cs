@@ -1,9 +1,7 @@
 #region 引入
-
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
-
 #endregion 引入
 
 using System;
@@ -15,7 +13,6 @@ using XFramework;
 public class PurchaseItems : BaseWindow
 {
     #region 变量声明
-
     private Button _windowMoveEvent;
     private Button _close;
     private ScrollRect _attributesDemand;
@@ -23,8 +20,7 @@ public class PurchaseItems : BaseWindow
     private Button _remove;
     private ScrollRect _itemDemand;
     private List<ItemDemandItem> _itemSlotContent;
-    private TextMeshProUGUI _tip;
-
+    private GameObject _tip;
     #endregion 变量声明
 
     [LabelText("属性预制体体")] public GameObject purchaseItemsRequiredAttributesObj;
@@ -44,34 +40,29 @@ public class PurchaseItems : BaseWindow
     protected override void InitView()
     {
         #region 变量查找
-
-        BindUi(ref _windowMoveEvent, "Title/WindowMoveEvent");
-        BindUi(ref _close, "Title/Close");
-        BindUi(ref _attributesDemand, "AttributesDemand");
-        BindUi(ref _purchaseItemsRequiredAttributesContent, "AttributesDemand/Viewport/PurchaseItemsRequiredAttributesContent");
-        BindUi(ref _remove, "AttributesDemand/Remove");
-        BindUi(ref _itemDemand, "ItemDemand");
-        BindUi(ref _itemSlotContent, "ItemDemand/Viewport/ItemSlotContent");
+        BindUi(ref _windowMoveEvent,"Title/WindowMoveEvent");
+        BindUi(ref _close,"Title/Close");
+        BindUi(ref _attributesDemand,"AttributesDemand");
+        BindUi(ref _purchaseItemsRequiredAttributesContent,"AttributesDemand/Viewport/PurchaseItemsRequiredAttributesContent");
+        BindUi(ref _remove,"AttributesDemand/Remove");
+        BindUi(ref _itemDemand,"ItemDemand");
+        BindUi(ref _itemSlotContent,"ItemDemand/Viewport/ItemSlotContent");
         for (int i = 0; i < _itemSlotContent.Count; i++)
         {
             _itemSlotContent[i].ViewStartInit();
             _itemSlotContent[i].InitData(i);
         }
-
-        BindUi(ref _tip, "Tip");
-
+        BindUi(ref _tip,"Tip");
         #endregion 变量查找
     }
 
     protected override void InitListener()
     {
         #region 变量绑定
-
-        BindListener(_windowMoveEvent, EventTriggerType.PointerDown, OnWindowMoveEventDown);
-        BindListener(_windowMoveEvent, EventTriggerType.PointerUp, OnWindowMoveEventUp);
-        BindListener(_close, EventTriggerType.PointerClick, OnCloseClick);
-        BindListener(_remove, EventTriggerType.PointerClick, OnRemoveClick);
-
+        BindListener(_windowMoveEvent,EventTriggerType.PointerDown,OnWindowMoveEventDown);
+        BindListener(_windowMoveEvent,EventTriggerType.PointerUp,OnWindowMoveEventUp);
+        BindListener(_close,EventTriggerType.PointerClick,OnCloseClick);
+        BindListener(_remove,EventTriggerType.PointerClick,OnRemoveClick);
         #endregion 变量绑定
 
         AddListenerEvent<int>("AddNewItem", AddNewItem);
@@ -80,7 +71,6 @@ public class PurchaseItems : BaseWindow
     }
 
     #region 变量方法
-
     private void OnWindowMoveEventDown(BaseEventData targetObj)
     {
         ListenerFrameComponent.Instance.itemAttributeShow.HideItemAttribute();
@@ -88,18 +78,15 @@ public class PurchaseItems : BaseWindow
         _moveOffset = window.transform.position - Input.mousePosition;
         moveWindow = true;
     }
-
     private void OnWindowMoveEventUp(BaseEventData targetObj)
     {
         moveWindow = false;
         ListenerFrameComponent.Instance.itemAttributeShow.SetWindowDrag(false);
     }
-
     private void OnCloseClick(BaseEventData targetObj)
     {
         HideThisView();
     }
-
     private void OnRemoveClick(BaseEventData targetObj)
     {
         if (currentOperationItemDemandItem == null)
@@ -116,7 +103,6 @@ public class PurchaseItems : BaseWindow
             itemDemandItemData.Remove(currentOperationItemDemandItem);
         }
     }
-
     #endregion 变量方法
 
     #region 自定义属性
@@ -164,7 +150,7 @@ public class PurchaseItems : BaseWindow
         }
     }
 
-    [LabelText("新增需求物品")]
+    [LabelText("新增需求物品")][AddListenerEvent]
     private void AddNewItem(int itemIndex)
     {
         foreach (ItemDemandItem itemDemandItem in _itemSlotContent)
@@ -183,7 +169,7 @@ public class PurchaseItems : BaseWindow
         ShowView(typeof(ItemAtlasDisplay));
     }
 
-    [LabelText("选中已有物品")]
+    [LabelText("选中已有物品")][AddListenerEvent]
     private void OnSelect(int itemIndex)
     {
         foreach (ItemDemandItem itemDemandItem in _itemSlotContent)
@@ -232,7 +218,7 @@ public class PurchaseItems : BaseWindow
         OnSelect(currentOperationItemDemandItem.itemIndex);
     }
 
-    [LabelText("修改属性值")]
+    [LabelText("修改属性值")][AddListenerEvent]
     private void OnEditorAttributeValue(ItemDemandItem itemDemandItem, AttributeValue attributeValue, Vector2 value)
     {
         itemDemandItemData[itemDemandItem][attributeValue] = value;

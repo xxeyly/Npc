@@ -10,7 +10,8 @@ public class AttributeCompositionSceneComponent : SceneComponent
 
     public override void StartComponent()
     {
-        AddReturnListenerEvent<List<Attribute>, List<AttributeComposition>>("GetQualifiedAttributeComposition", GetQualifiedAttributeComposition);
+        AddReturnListenerEvent<List<BaseAttribute>, List<AttributeComposition>>("GetQualifiedAttributeComposition",
+            GetQualifiedAttributeComposition);
     }
 
     public override void EndComponent()
@@ -18,7 +19,8 @@ public class AttributeCompositionSceneComponent : SceneComponent
     }
 
     [LabelText("获得合格属性组")]
-    private List<AttributeComposition> GetQualifiedAttributeComposition(List<Attribute> attributeGroup)
+    [AddListenerEvent]
+    private List<AttributeComposition> GetQualifiedAttributeComposition(List<BaseAttribute> attributeGroup)
     {
         List<AttributeComposition> attributeCompositions = new List<AttributeComposition>();
         foreach (AttributeComposition attributeComposition in attributeCompositionGroup)
@@ -52,7 +54,8 @@ public class AttributeCompositionSceneComponent : SceneComponent
             {
                 if (attributeCompositions[i].priority < attributeCompositions[j].priority)
                 {
-                    (attributeCompositions[i], attributeCompositions[j]) = (attributeCompositions[j], attributeCompositions[i]);
+                    (attributeCompositions[i], attributeCompositions[j]) =
+                        (attributeCompositions[j], attributeCompositions[i]);
                 }
             }
         }
@@ -61,11 +64,12 @@ public class AttributeCompositionSceneComponent : SceneComponent
     }
 
     [LabelText("比较两个属性是否包含")]
-    private bool AttributeCompositionProportionContain(List<Attribute> compareAttributeGroup, List<AttributeCompositionProportion> primaryAttributeGroup)
+    private bool AttributeCompositionProportionContain(List<BaseAttribute> compareAttributeGroup,
+        List<AttributeCompositionProportion> primaryAttributeGroup)
     {
         List<int> compareAttribute = new List<int>();
 
-        foreach (Attribute attribute in compareAttributeGroup)
+        foreach (BaseAttribute attribute in compareAttributeGroup)
         {
             compareAttribute.Add(attribute.attributeId);
         }
@@ -74,7 +78,7 @@ public class AttributeCompositionSceneComponent : SceneComponent
 
         foreach (AttributeCompositionProportion attributeCompositionProportion in primaryAttributeGroup)
         {
-            primaryAttribute.Add(attributeCompositionProportion.attribute.attributeId);
+            primaryAttribute.Add(attributeCompositionProportion.baseAttribute.attributeId);
         }
 
         for (int i = 0; i < primaryAttribute.Count; i++)
@@ -95,21 +99,24 @@ public class AttributeCompositionSceneComponent : SceneComponent
     /// <param name="priority"></param>
     /// <param name="requiredTime"></param>
     /// <param name="requiredTemperature"></param>
-    /// <param name="finalAttribute"></param>
+    /// <param name="finalBaseAttribute"></param>
     [BoxGroup]
     [Button("创建属性配方")]
-    public void CreateItem(List<AttributeCompositionProportion> attributeGroup, int priority, int requiredTime, int requiredTemperature, Attribute finalAttribute)
+    public void CreateItem(List<AttributeCompositionProportion> attributeGroup, int priority, int requiredTime,
+        int requiredTemperature, BaseAttribute finalBaseAttribute)
     {
         AttributeComposition attributeComposition = ScriptableObject.CreateInstance<AttributeComposition>();
         attributeComposition.attributeGroup = attributeGroup;
         attributeComposition.priority = priority;
         attributeComposition.requiredTime = requiredTime;
         attributeComposition.requiredTemperature = requiredTemperature;
-        attributeComposition.finalAttribute = finalAttribute;
+        attributeComposition.finalBaseAttribute = finalBaseAttribute;
         //创建新的物品
-        if (UnityEditor.AssetDatabase.LoadAssetAtPath<Item>(General.assetRootPath + "AttributeComposition/" + finalAttribute.AttributeName + "配方" + ".asset") == null)
+        if (UnityEditor.AssetDatabase.LoadAssetAtPath<Item>(General.assetRootPath + "AttributeComposition/" +
+                                                            finalBaseAttribute.AttributeName + "配方" + ".asset") == null)
         {
-            UnityEditor.AssetDatabase.CreateAsset(attributeComposition, General.assetRootPath + "AttributeComposition/" + finalAttribute.AttributeName + "配方" + ".asset");
+            UnityEditor.AssetDatabase.CreateAsset(attributeComposition,
+                General.assetRootPath + "AttributeComposition/" + finalBaseAttribute.AttributeName + "配方" + ".asset");
             UnityEditor.AssetDatabase.SaveAssets();
             UnityEditor.AssetDatabase.Refresh();
         }

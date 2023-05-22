@@ -21,14 +21,17 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
     {
         AddListenerEvent<int, List<ItemSlot>>("SaveItemSlotSaveDataGroup", SaveItemSlotSaveDataGroup);
         AddReturnListenerEvent<int, ItemSlotSaveDataGroup>("GetItemSlotSaveDataGroup", GetItemSlotSaveDataGroup);
-        AddListenerEvent<int, SmallPharmaceuticalApparatusSaveDataGroup>("SaveSmallPharmaceuticalApparatusSaveDataGroup", SaveSmallPharmaceuticalApparatusSaveDataGroup);
-        AddReturnListenerEvent<int, SmallPharmaceuticalApparatusSaveDataGroup>("GetSmallPharmaceuticalApparatusSaveDataGroup", GetSmallPharmaceuticalApparatusSaveDataGroup);
+        AddListenerEvent<int, SmallPharmaceuticalApparatusSaveDataGroup>(
+            "SaveSmallPharmaceuticalApparatusSaveDataGroup", SaveSmallPharmaceuticalApparatusSaveDataGroup);
+        AddReturnListenerEvent<int, SmallPharmaceuticalApparatusSaveDataGroup>(
+            "GetSmallPharmaceuticalApparatusSaveDataGroup", GetSmallPharmaceuticalApparatusSaveDataGroup);
         AddListenerEvent<ItemSlotDataSave>("SetItemSlotDataSaveEvent", SetItemSlotDataSaveEvent);
         AddListenerEvent<ItemSlotDataLoad>("SetItemSlotDataLoadEvent", SetItemSlotDataLoadEvent);
         AddListenerEvent("Save", Save);
         AddListenerEvent("Load", Load);
     }
 
+    [AddListenerEvent]
     private void Load()
     {
         _itemSlotDataLoadEvent?.Invoke();
@@ -38,16 +41,19 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
     {
     }
 
+    [AddListenerEvent]
     private void Save()
     {
         _itemSlotDataSaveEvent?.Invoke();
     }
 
+    [AddListenerEvent]
     private void SetItemSlotDataSaveEvent(ItemSlotDataSave action)
     {
         _itemSlotDataSaveEvent += action;
     }
 
+    [AddListenerEvent]
     private void SetItemSlotDataLoadEvent(ItemSlotDataLoad action)
     {
         _itemSlotDataLoadEvent += action;
@@ -55,14 +61,19 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
 
     #region 物品格子
 
+    [AddListenerEvent]
     private void SaveItemSlotSaveDataGroup(int index, List<ItemSlot> itemSlot)
     {
-        if (UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSlotSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset") == null)
+        if (UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSlotSaveDataGroup>(General.assetRootPath + "Save/" + index +
+                                                                             ".asset") == null)
         {
-            UnityEditor.AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<ItemSlotSaveDataGroup>(), General.assetRootPath + "Save/" + index + ".asset");
+            UnityEditor.AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<ItemSlotSaveDataGroup>(),
+                General.assetRootPath + "Save/" + index + ".asset");
         }
 
-        ItemSlotSaveDataGroup itemSlotSaveDataGroup = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSlotSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset");
+        ItemSlotSaveDataGroup itemSlotSaveDataGroup =
+            UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSlotSaveDataGroup>(General.assetRootPath + "Save/" + index +
+                                                                             ".asset");
         itemSlotSaveDataGroup.itemSlotSaveData.Clear();
 
         foreach (ItemSlot slot in itemSlot)
@@ -71,7 +82,8 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
             {
                 itemSlotSaveDataGroup.itemSlotSaveData.Add(new ItemSlotSaveData()
                 {
-                    itemId = slot.item.ItemId, itemSlotIndex = slot.itemIndex, attributeValueList = slot.item.attributeValueList
+                    itemId = slot.item.ItemId, itemSlotIndex = slot.itemIndex,
+                    attributeValueList = slot.item.attributeValueList
                 });
             }
         }
@@ -81,16 +93,20 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
         UnityEditor.AssetDatabase.SaveAssets();
     }
 
+    [AddListenerEvent]
     private ItemSlotSaveDataGroup GetItemSlotSaveDataGroup(int index)
     {
         ItemSlotSaveDataGroup itemSlotSaveDataGroup = null;
-        if (UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSlotSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset") == null)
+        if (UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSlotSaveDataGroup>(General.assetRootPath + "Save/" + index +
+                                                                             ".asset") == null)
         {
             return null;
         }
         else
         {
-            itemSlotSaveDataGroup = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSlotSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset");
+            itemSlotSaveDataGroup =
+                UnityEditor.AssetDatabase.LoadAssetAtPath<ItemSlotSaveDataGroup>(General.assetRootPath + "Save/" +
+                    index + ".asset");
         }
 
         return itemSlotSaveDataGroup;
@@ -100,47 +116,71 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
 
     #region 小型制药器
 
-    private void SaveSmallPharmaceuticalApparatusSaveDataGroup(int index, SmallPharmaceuticalApparatusSaveDataGroup saveSmallPharmaceuticalApparatusSaveDataGroup)
+    [AddListenerEvent]
+    private void SaveSmallPharmaceuticalApparatusSaveDataGroup(int index,
+        SmallPharmaceuticalApparatusSaveDataGroup saveSmallPharmaceuticalApparatusSaveDataGroup)
     {
-        if (UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset") == null)
+        if (UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(General.assetRootPath +
+                "Save/" + index + ".asset") == null)
         {
-            UnityEditor.AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<SmallPharmaceuticalApparatusSaveDataGroup>(), General.assetRootPath + "Save/" + index + ".asset");
+            UnityEditor.AssetDatabase.CreateAsset(
+                ScriptableObject.CreateInstance<SmallPharmaceuticalApparatusSaveDataGroup>(),
+                General.assetRootPath + "Save/" + index + ".asset");
         }
 
-        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset");
-        smallPharmaceuticalApparatusSaveDataGroup.currentWater = saveSmallPharmaceuticalApparatusSaveDataGroup.currentWater;
-        smallPharmaceuticalApparatusSaveDataGroup.incrementWater = saveSmallPharmaceuticalApparatusSaveDataGroup.incrementWater;
+        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup =
+            UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(General.assetRootPath +
+                "Save/" + index + ".asset");
+        smallPharmaceuticalApparatusSaveDataGroup.currentWater =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.currentWater;
+        smallPharmaceuticalApparatusSaveDataGroup.incrementWater =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.incrementWater;
         smallPharmaceuticalApparatusSaveDataGroup.waterMax = saveSmallPharmaceuticalApparatusSaveDataGroup.waterMax;
-        smallPharmaceuticalApparatusSaveDataGroup.currentTemperature = saveSmallPharmaceuticalApparatusSaveDataGroup.currentTemperature;
-        smallPharmaceuticalApparatusSaveDataGroup.temperatureMax = saveSmallPharmaceuticalApparatusSaveDataGroup.temperatureMax;
-        smallPharmaceuticalApparatusSaveDataGroup.currentEnergy = saveSmallPharmaceuticalApparatusSaveDataGroup.currentEnergy;
-        smallPharmaceuticalApparatusSaveDataGroup.temperatureConversionRatio = saveSmallPharmaceuticalApparatusSaveDataGroup.temperatureConversionRatio;
-        smallPharmaceuticalApparatusSaveDataGroup.everyTimeBurningMultiple = saveSmallPharmaceuticalApparatusSaveDataGroup.everyTimeBurningMultiple;
-        smallPharmaceuticalApparatusSaveDataGroup.energyBurningTimeTask = saveSmallPharmaceuticalApparatusSaveDataGroup.energyBurningTimeTask;
-        smallPharmaceuticalApparatusSaveDataGroup.energyBurningEndTimeTask = saveSmallPharmaceuticalApparatusSaveDataGroup.energyBurningEndTimeTask;
+        smallPharmaceuticalApparatusSaveDataGroup.currentTemperature =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.currentTemperature;
+        smallPharmaceuticalApparatusSaveDataGroup.temperatureMax =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.temperatureMax;
+        smallPharmaceuticalApparatusSaveDataGroup.currentEnergy =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.currentEnergy;
+        smallPharmaceuticalApparatusSaveDataGroup.temperatureConversionRatio =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.temperatureConversionRatio;
+        smallPharmaceuticalApparatusSaveDataGroup.everyTimeBurningMultiple =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.everyTimeBurningMultiple;
+        smallPharmaceuticalApparatusSaveDataGroup.energyBurningTimeTask =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.energyBurningTimeTask;
+        smallPharmaceuticalApparatusSaveDataGroup.energyBurningEndTimeTask =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.energyBurningEndTimeTask;
         smallPharmaceuticalApparatusSaveDataGroup.waterTank = null;
         smallPharmaceuticalApparatusSaveDataGroup.produce = saveSmallPharmaceuticalApparatusSaveDataGroup.produce;
         smallPharmaceuticalApparatusSaveDataGroup.energyTank = saveSmallPharmaceuticalApparatusSaveDataGroup.energyTank;
-        smallPharmaceuticalApparatusSaveDataGroup.attributeCompositionDurationDict = saveSmallPharmaceuticalApparatusSaveDataGroup.attributeCompositionDurationDict;
-        smallPharmaceuticalApparatusSaveDataGroup.combustionInterval = saveSmallPharmaceuticalApparatusSaveDataGroup.combustionInterval;
-        smallPharmaceuticalApparatusSaveDataGroup.currentCombustionTime = saveSmallPharmaceuticalApparatusSaveDataGroup.currentCombustionTime;
+        smallPharmaceuticalApparatusSaveDataGroup.attributeCompositionDurationDict =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.attributeCompositionDurationDict;
+        smallPharmaceuticalApparatusSaveDataGroup.combustionInterval =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.combustionInterval;
+        smallPharmaceuticalApparatusSaveDataGroup.currentCombustionTime =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.currentCombustionTime;
         smallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData.Clear();
-        smallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData = saveSmallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData;
+        smallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData =
+            saveSmallPharmaceuticalApparatusSaveDataGroup.itemSlotSaveData;
         UnityEditor.AssetDatabase.Refresh();
         UnityEditor.EditorUtility.SetDirty(smallPharmaceuticalApparatusSaveDataGroup);
         UnityEditor.AssetDatabase.SaveAssets();
     }
 
+    [AddListenerEvent]
     private SmallPharmaceuticalApparatusSaveDataGroup GetSmallPharmaceuticalApparatusSaveDataGroup(int index)
     {
         SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = null;
-        if (UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset") == null)
+        if (UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(General.assetRootPath +
+                "Save/" + index + ".asset") == null)
         {
             return null;
         }
         else
         {
-            smallPharmaceuticalApparatusSaveDataGroup = UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(General.assetRootPath + "Save/" + index + ".asset");
+            smallPharmaceuticalApparatusSaveDataGroup =
+                UnityEditor.AssetDatabase.LoadAssetAtPath<SmallPharmaceuticalApparatusSaveDataGroup>(
+                    General.assetRootPath + "Save/" + index + ".asset");
         }
 
         return smallPharmaceuticalApparatusSaveDataGroup;

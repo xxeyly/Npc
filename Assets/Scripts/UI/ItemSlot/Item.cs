@@ -19,11 +19,11 @@ public class Item : ScriptableObject
 
     [LabelText("物品属性")] [TableList] public List<AttributeValue> attributeValueList = new List<AttributeValue>();
 
-    public bool ContainsAttribute(Attribute attribute)
+    public bool ContainsAttribute(BaseAttribute baseAttribute)
     {
         foreach (AttributeValue attributeValue in attributeValueList)
         {
-            if (attributeValue.attribute.GetAttributeType() == attribute.GetAttributeType())
+            if (attributeValue.baseAttribute.GetAttributeType() == baseAttribute.GetAttributeType())
             {
                 return true;
             }
@@ -38,7 +38,7 @@ public class Item : ScriptableObject
         bool identical = false;
         foreach (AttributeValue value in attributeValueList)
         {
-            if (value.attribute.GetAttributeType() == attributeValue.attribute.GetAttributeType())
+            if (value.baseAttribute.GetAttributeType() == attributeValue.baseAttribute.GetAttributeType())
             {
                 value.value += attributeValue.value;
                 identical = true;
@@ -68,6 +68,6 @@ public class Item : ScriptableObject
 [Serializable]
 public class AttributeValue
 {
-    public Attribute attribute;
+    [FormerlySerializedAs("attribute")] public BaseAttribute baseAttribute;
     public int value;
 }

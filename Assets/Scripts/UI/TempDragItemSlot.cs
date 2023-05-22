@@ -2,7 +2,9 @@
 
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+
 #endregion 引入
+
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -13,6 +15,7 @@ using XFramework;
 public class TempDragItemSlot : BaseWindow
 {
     #region 变量声明
+
     private GameObject _itemSlot;
     private Image _normal;
     private Image _null;
@@ -21,6 +24,7 @@ public class TempDragItemSlot : BaseWindow
     private Image _itemIcon;
 
     #endregion 变量声明
+
     [LabelText("拖拽物品格子")] private Item _dragItem;
     [LabelText("偏移值")] [SerializeField] private Vector2 offsetValue;
     [LabelText("拖拽中")] [SerializeField] private bool drag;
@@ -38,12 +42,14 @@ public class TempDragItemSlot : BaseWindow
 
     protected override void InitView()
     {
-       #region 变量查找
+        #region 变量查找
+
         BindUi(ref _itemSlot, "ItemSlot");
         BindUi(ref _normal, "ItemSlot/Normal");
         BindUi(ref _null, "ItemSlot/Null");
         BindUi(ref _content, "ItemSlot/Content");
         BindUi(ref _itemIcon, "ItemSlot/ItemIcon");
+
         #endregion 变量查找
     }
 
@@ -52,6 +58,7 @@ public class TempDragItemSlot : BaseWindow
         #region 变量绑定
 
         #endregion 变量绑定
+
         AddListenerEvent<ItemSlot>("SetDragItemSlot", SetDragItemSlot);
         AddListenerEvent("RemoveDragItemSlot", RemoveDragItemSlot);
         AddListenerEvent<ItemSlot>("SetEnterItemSlot", SetEnterItemSlot);
@@ -79,12 +86,14 @@ public class TempDragItemSlot : BaseWindow
     }
 
     [LabelText("拖拽状态")]
+    [AddListenerEvent]
     private bool GetDragSate()
     {
         return drag;
     }
 
     [LabelText("设置拖拽物品格子")]
+    [AddListenerEvent]
     private void SetDragItemSlot(ItemSlot itemSlot)
     {
         if (_dragItem == null)
@@ -101,12 +110,14 @@ public class TempDragItemSlot : BaseWindow
     }
 
     [LabelText("设置进入物品格子")]
+    [AddListenerEvent]
     private void SetEnterItemSlot(ItemSlot itemSlot)
     {
         enterItemSlot = itemSlot;
     }
 
     [LabelText("设置进入物品格子空")]
+    [AddListenerEvent]
     private void SetEnterItemSlotNull()
     {
         enterItemSlot = null;
@@ -126,6 +137,7 @@ public class TempDragItemSlot : BaseWindow
     }
 
     [LabelText("移除拖拽物品格子")]
+    [AddListenerEvent]
     private void RemoveDragItemSlot()
     {
         drag = false;

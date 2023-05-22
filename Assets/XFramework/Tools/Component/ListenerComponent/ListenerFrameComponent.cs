@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
@@ -51,12 +52,62 @@ namespace XFramework
 
         public override void FrameSceneInitComponent()
         {
+            List<BaseWindow> tempSceneBaseWindow = DataFrameComponent.GetAllObjectsInScene<BaseWindow>(GameRootStart.Instance.loadScene.name);
+
+            foreach (BaseWindow window in tempSceneBaseWindow)
+            {
+                if (!window.GetComponent<ChildBaseWindow>())
+                {
+                    foreach (MethodInfo methodInfo in window.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static))
+                    {
+                        foreach (Attribute customAttribute in methodInfo.GetCustomAttributes())
+                        {
+                            if (customAttribute is AddListenerEventAttribute)
+                            {
+                                if (methodInfo.ReturnType == typeof(void))
+                                {
+                                    // AddListenerEvent(methodInfo.Name,()=>{methodInfo.Invoke(null,methodInfo.GetParameters());
+                                    if (methodInfo.GetParameters().Length == 0)
+                                    {
+                                        CallBack callBack = () => { methodInfo.Invoke(null, methodInfo.GetParameters()); };
+                                        AddListenerEvent(methodInfo.Name, callBack);
+                                    }
+                                    else if (methodInfo.GetParameters().Length == 1)
+                                    {
+                                        // CallBack<> callBack = new CallBack<>();
+                                        AddListenerEvent(methodInfo.Name,(Type t)=>{});
+                                    }
+                                    else if (methodInfo.GetParameters().Length == 0)
+                                    {
+                                        CallBack callBack = () => { methodInfo.Invoke(null, methodInfo.GetParameters()); };
+                                        AddListenerEvent(methodInfo.Name, callBack);
+                                    }
+                                    else if (methodInfo.GetParameters().Length == 0)
+                                    {
+                                        CallBack callBack = () => { methodInfo.Invoke(null, methodInfo.GetParameters()); };
+                                        AddListenerEvent(methodInfo.Name, callBack);
+                                    }
+                                    else if (methodInfo.GetParameters().Length == 0)
+                                    {
+                                        CallBack callBack = () => { methodInfo.Invoke(null, methodInfo.GetParameters()); };
+                                        AddListenerEvent(methodInfo.Name, callBack);
+                                    }
+                                }
+                                else
+                                {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public override void FrameEndComponent()
         {
         }
-
+     
+       
         #region 不带返回值添加监听
 
         /// <summary>
@@ -451,7 +502,8 @@ namespace XFramework
                     }
 
                     if (customDelegate.Method.GetParameters().Length == 1 &&
-                        customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         ((CallBack<T>)customDelegate)(t);
                         return;
@@ -481,7 +533,8 @@ namespace XFramework
                 {
                     if (customDelegate.Method.GetParameters().Length == 2 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
-                        customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         ((CallBack<T, X>)customDelegate)(t, x);
                         return;
@@ -512,7 +565,8 @@ namespace XFramework
                     if (customDelegate.Method.GetParameters().Length == 3 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
                         customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() &&
-                        customDelegate.Method.GetParameters()[2].ParameterType == y.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[2].ParameterType == y.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         ((CallBack<T, X, Y>)customDelegate)(t, x, y);
                         return;
@@ -544,7 +598,8 @@ namespace XFramework
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
                         customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() &&
                         customDelegate.Method.GetParameters()[2].ParameterType == y.GetType() &&
-                        customDelegate.Method.GetParameters()[3].ParameterType == z.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[3].ParameterType == z.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         ((CallBack<T, X, Y, Z>)customDelegate)(t, x, y, z);
                         return;
@@ -577,7 +632,8 @@ namespace XFramework
                         customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() &&
                         customDelegate.Method.GetParameters()[2].ParameterType == y.GetType() &&
                         customDelegate.Method.GetParameters()[3].ParameterType == z.GetType() &&
-                        customDelegate.Method.GetParameters()[4].ParameterType == w.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[4].ParameterType == w.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         ((CallBack<T, X, Y, Z, W>)customDelegate)(t, x, y, z, w);
                         return;
@@ -636,7 +692,8 @@ namespace XFramework
                 foreach (Delegate customDelegate in listenerReturnCallBackDic[eventClassName])
                 {
                     if (customDelegate.Method.GetParameters().Length == 1 &&
-                        customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         return ((ReturnCallBack<T, R>)customDelegate)(t);
                     }
@@ -667,7 +724,8 @@ namespace XFramework
                 {
                     if (customDelegate.Method.GetParameters().Length == 2 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
-                        customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         return ((ReturnCallBack<T, X, R>)customDelegate)(t, x);
                     }
@@ -699,7 +757,8 @@ namespace XFramework
                     if (customDelegate.Method.GetParameters().Length == 3 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
                         customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() &&
-                        customDelegate.Method.GetParameters()[2].ParameterType == y.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[2].ParameterType == y.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         return ((ReturnCallBack<T, X, Y, R>)customDelegate)(t, x, y);
                     }
@@ -732,7 +791,8 @@ namespace XFramework
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
                         customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() &&
                         customDelegate.Method.GetParameters()[2].ParameterType == y.GetType() &&
-                        customDelegate.Method.GetParameters()[3].ParameterType == z.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[3].ParameterType == z.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         return ((ReturnCallBack<T, X, Y, Z, R>)customDelegate)(t, x, y, z);
                     }
@@ -766,7 +826,8 @@ namespace XFramework
                         customDelegate.Method.GetParameters()[1].ParameterType == x.GetType() &&
                         customDelegate.Method.GetParameters()[2].ParameterType == y.GetType() &&
                         customDelegate.Method.GetParameters()[3].ParameterType == z.GetType() &&
-                        customDelegate.Method.GetParameters()[4].ParameterType == w.GetType() && customDelegate.Method.Name == eventName)
+                        customDelegate.Method.GetParameters()[4].ParameterType == w.GetType() &&
+                        customDelegate.Method.Name == eventName)
                     {
                         return ((ReturnCallBack<T, X, Y, Z, W, R>)customDelegate)(t, x, y, z, w);
                     }

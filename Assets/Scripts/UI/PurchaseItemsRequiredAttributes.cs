@@ -80,7 +80,7 @@ public class PurchaseItemsRequiredAttributes : ChildBaseWindow
     {
         this._itemDemandItem = itemDemandItem;
         this._attributeValue = attributeValue;
-        _attributesName.text = attributeValue.attribute.AttributeName;
+        _attributesName.text = attributeValue.baseAttribute.AttributeName;
         _min.text = value.x.ToString();
         _max.text = value.y.ToString();
         dataInit = true;

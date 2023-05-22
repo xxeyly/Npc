@@ -13,7 +13,7 @@ public class AttributeComposition : ScriptableObject
     [LabelText("优先级")] public int priority;
     [LabelText("所需时间")] public int requiredTime;
     [LabelText("所需温度")] public int requiredTemperature;
-    [LabelText("最终属性")] public Attribute finalAttribute;
+    [FormerlySerializedAs("finalAttribute")] [LabelText("最终属性")] public BaseAttribute finalBaseAttribute;
 
     [LabelText("产出率")] public int outputRate = 100;
 
@@ -34,6 +34,6 @@ public class AttributeComposition : ScriptableObject
 [InfoBox("属性合成比例")]
 public class AttributeCompositionProportion
 {
-    [LabelText("属性")] public Attribute attribute;
+    [FormerlySerializedAs("attribute")] [LabelText("属性")] public BaseAttribute baseAttribute;
     [LabelText("比例值")] public int value;
 }
