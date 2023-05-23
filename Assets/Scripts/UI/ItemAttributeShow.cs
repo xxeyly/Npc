@@ -76,10 +76,6 @@ public class ItemAttributeShow : BaseWindow
         #region 变量绑定
 
         #endregion 变量绑定
-
-        AddListenerEvent<Item, Vector3>("ShowItemAttribute", ShowItemAttribute);
-        AddListenerEvent("HideItemAttribute", HideItemAttribute);
-        AddListenerEvent<bool>("SetWindowDrag", SetWindowDrag);
     }
 
     #region 变量方法

@@ -10,8 +10,7 @@ public class AttributeCompositionSceneComponent : SceneComponent
 
     public override void StartComponent()
     {
-        AddReturnListenerEvent<List<BaseAttribute>, List<AttributeComposition>>("GetQualifiedAttributeComposition",
-            GetQualifiedAttributeComposition);
+        
     }
 
     public override void EndComponent()

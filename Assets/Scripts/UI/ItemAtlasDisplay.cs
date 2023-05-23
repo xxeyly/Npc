@@ -63,13 +63,7 @@ public class ItemAtlasDisplay : BaseWindow
         BindListener(_close, EventTriggerType.PointerClick, OnCloseClick);
 
         #endregion 变量绑定
-
-        AddListenerEvent("InitAtlas", InitAtlas);
-        AddListenerEvent<int>("OnEnter", OnEnter);
-        AddListenerEvent<SelectItemDelegate>("AddSelectItemDelegate", AddSelectItemDelegate);
-        AddListenerEvent<SelectItemDelegate>("RemoveSelectItemDelegate", RemoveSelectItemDelegate);
-        AddListenerEvent<int>("OnSelect", OnSelect);
-        AddListenerEvent<bool>("SetSelectItemState", SetSelectItemState);
+       
     }
 
     #region 变量方法

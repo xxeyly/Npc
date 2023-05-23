@@ -46,6 +46,7 @@ namespace XFramework
 
         public override void FrameSceneInitComponent()
         {
+            OnGetAllAddListenerEvent();
         }
 
         public override void FrameEndComponent()
@@ -336,7 +337,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 0 && customDelegate.Method.Name == delegateType)
                     {
@@ -355,7 +356,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (t == null)
                     {
@@ -382,7 +383,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 2 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -405,7 +406,7 @@ namespace XFramework
             if (allListener.ContainsKey(eventType))
 
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 3 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -429,7 +430,7 @@ namespace XFramework
             if (allListener.ContainsKey(eventType))
 
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 4 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -453,7 +454,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 5 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -482,7 +483,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 0 &&
                         customDelegate.Method.Name == delegateType)
@@ -503,7 +504,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 1 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -525,7 +526,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 2 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -548,7 +549,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 3 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -572,7 +573,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 4 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -597,7 +598,7 @@ namespace XFramework
         {
             if (allListener.ContainsKey(eventType))
             {
-                foreach (Delegate customDelegate in allListener[delegateType])
+                foreach (Delegate customDelegate in allListener[eventType])
                 {
                     if (customDelegate.Method.GetParameters().Length == 5 &&
                         customDelegate.Method.GetParameters()[0].ParameterType == t.GetType() &&
@@ -621,25 +622,28 @@ namespace XFramework
 
         #endregion
 
-        [Button]
-        private void OnGetAllAddListenerEvent()
+        public void OnGetAllAddListenerEvent()
         {
             foreach (SceneComponent sceneComponent in DataFrameComponent.GetAllObjectsInScene<SceneComponent>())
             {
-                ReflexBinEventListener(sceneComponent.GetType());
+                ReflexBinEventListener(sceneComponent);
             }
 
             foreach (BaseWindow baseWindow in DataFrameComponent.GetAllObjectsInScene<BaseWindow>())
             {
-                ReflexBinEventListener(baseWindow.GetType());
+                if (baseWindow.GetComponent<ChildBaseWindow>())
+                {
+                    continue;
+                }
+
+                ReflexBinEventListener(baseWindow);
             }
         }
 
-        private void ReflexBinEventListener(Type type)
+        private void ReflexBinEventListener(Object targetObject)
         {
-            List<Delegate> eventDelegate = new List<Delegate>();
             //反射所有Type中的方法
-            foreach (MethodInfo methodInfo in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+            foreach (MethodInfo methodInfo in targetObject.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
             {
                 //获得该方法所有使用的特性
                 foreach (Attribute customAttribute in methodInfo.GetCustomAttributes())
@@ -704,7 +708,6 @@ namespace XFramework
                             }
                             else
                             {
-                                Debug.Log(parameterInfo.Length);
                                 if (parameterInfo.Length == 1)
                                 {
                                     delegateType = typeof(CallBack<>).MakeGenericType(parameterInfo);
@@ -730,14 +733,12 @@ namespace XFramework
 
                         if (delegateType != null)
                         {
-                            Delegate tempDelegate = Delegate.CreateDelegate(delegateType, type, methodInfo);
-                            eventDelegate.Add(tempDelegate);
+                            Delegate tempDelegate = Delegate.CreateDelegate(delegateType, targetObject, methodInfo);
+                            AddDelegateToListenerEvent(targetObject.GetType().Name, tempDelegate);
                         }
                     }
                 }
             }
-
-            allListener.Add(type.Name, eventDelegate);
         }
     }
 }

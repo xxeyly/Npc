@@ -19,16 +19,7 @@ public class ItemSlotDataSaveSceneComponent : SceneComponent
 
     public override void StartComponent()
     {
-        AddListenerEvent<int, List<ItemSlot>>("SaveItemSlotSaveDataGroup", SaveItemSlotSaveDataGroup);
-        AddReturnListenerEvent<int, ItemSlotSaveDataGroup>("GetItemSlotSaveDataGroup", GetItemSlotSaveDataGroup);
-        AddListenerEvent<int, SmallPharmaceuticalApparatusSaveDataGroup>(
-            "SaveSmallPharmaceuticalApparatusSaveDataGroup", SaveSmallPharmaceuticalApparatusSaveDataGroup);
-        AddReturnListenerEvent<int, SmallPharmaceuticalApparatusSaveDataGroup>(
-            "GetSmallPharmaceuticalApparatusSaveDataGroup", GetSmallPharmaceuticalApparatusSaveDataGroup);
-        AddListenerEvent<ItemSlotDataSave>("SetItemSlotDataSaveEvent", SetItemSlotDataSaveEvent);
-        AddListenerEvent<ItemSlotDataLoad>("SetItemSlotDataLoadEvent", SetItemSlotDataLoadEvent);
-        AddListenerEvent("Save", Save);
-        AddListenerEvent("Load", Load);
+       
     }
 
     [AddListenerEvent]

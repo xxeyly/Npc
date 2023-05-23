@@ -7,20 +7,11 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using XFramework;
 
-public class GenDataSceneComponent : SceneComponent
+public class GenerateListenerComponent
 {
-    [SerializeField] private List<GenerateClassData> _generateClassData = new List<GenerateClassData>();
+    [SerializeField] private static List<GenerateClassData> _generateClassData = new List<GenerateClassData>();
 
-    public override void StartComponent()
-    {
-    }
-
-    public override void EndComponent()
-    {
-    }
-
-    [Button]
-    private void GetAllTypes()
+    public static void GenerateListener()
     {
         _generateClassData.Clear();
         Assembly assembly = Assembly.Load("Assembly-CSharp");
@@ -124,7 +115,7 @@ public class GenDataSceneComponent : SceneComponent
                 if (generateMethodData.parameterType.Count == 0)
                 {
                     generateClassContent += GenerateGeneral.Indents(16) + executeEventContent + "(\"" +
-                                            generateClassData.className + "-" + generateMethodData.methodName + "\"" +
+                                            generateClassData.className + "\"" + "," + "\"" + generateMethodData.methodName + "\"" +
                                             ");" + GenerateGeneral.LineFeed;
                 }
                 else
@@ -139,7 +130,7 @@ public class GenDataSceneComponent : SceneComponent
                     }
 
                     generateClassContent += GenerateGeneral.Indents(16) + executeEventContent + "(\"" +
-                                            generateClassData.className + "-" + generateMethodData.methodName + "\"" +
+                                            generateClassData.className + "\"" + "," + "\"" + generateMethodData.methodName + "\"" +
                                             "," + inputParameterTypeContent + ");" +
                                             GenerateGeneral.LineFeed;
                 }
@@ -150,10 +141,9 @@ public class GenDataSceneComponent : SceneComponent
             generateClassContent += GenerateGeneral.Indents(8) + "}" + GenerateGeneral.LineFeed;
         }
 
-        Debug.Log(generateClassContent);
         string newCon = ReplaceScriptContent(oldContent, generateClassContent, "//监听生成开始", "//监听生成结束");
-        Debug.Log(newCon);
         FileOperation.SaveTextToLoad(GenerateGeneral.GetPath("ListenerComponentData"), newCon);
+        Debug.Log("监听生成结束!");
     }
 
     /// <summary>
@@ -164,7 +154,7 @@ public class GenDataSceneComponent : SceneComponent
     /// <param name="insertStartMark"></param>
     /// <param name="insertEndMark"></param>
     /// <returns></returns>
-    public static string ReplaceScriptContent(string scriptsContent, string insertContent, string insertStartMark,
+    private static string ReplaceScriptContent(string scriptsContent, string insertContent, string insertStartMark,
         string insertEndMark)
     {
         if (scriptsContent.Contains(insertStartMark) && scriptsContent.Contains(insertEndMark))
@@ -206,7 +196,7 @@ public class GenDataSceneComponent : SceneComponent
 
 
     [LabelText("Type转换")]
-    private string CommonTypeConversion(Type type)
+    private static string CommonTypeConversion(Type type)
     {
         if (type.Name == nameof(Boolean))
         {

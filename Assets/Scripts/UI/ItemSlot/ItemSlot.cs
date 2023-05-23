@@ -3,7 +3,9 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+
 #endregion 引入
+
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -13,6 +15,7 @@ using XFramework;
 public class ItemSlot : ChildBaseWindow
 {
     #region 变量声明
+
     private Image _normal;
     private Image _null;
     private Image _itemIcon;
@@ -21,17 +24,18 @@ public class ItemSlot : ChildBaseWindow
     private Button _event;
 
     #endregion 变量声明
+
     [LabelText("物品属性")] public Item item;
     [LabelText("限制")] public bool restricted;
     [LabelText("限制物品列表")] public List<Item> restrictedItemList = new List<Item>();
     private ScrollRect _scrollRect;
     private bool _drag;
 
-    public delegate void PlaceItem(Item item);
+    public delegate void PlaceItem(ItemSlot itemSlot, Item item);
 
     public PlaceItem PlaceItemEvent;
 
-    public delegate void RemoveItem();
+    public delegate void RemoveItem(ItemSlot itemSlot, Item item);
 
     public RemoveItem RemoveItemEvent;
 
@@ -41,18 +45,21 @@ public class ItemSlot : ChildBaseWindow
 
     protected override void InitView()
     {
-       #region 变量查找
+        #region 变量查找
+
         BindUi(ref _normal, "Normal");
         BindUi(ref _null, "Null");
         BindUi(ref _itemIcon, "ItemIcon");
         BindUi(ref _content, "Content");
         BindUi(ref _event, "Event");
+
         #endregion 变量查找
     }
 
     protected override void InitListener()
     {
         #region 变量绑定
+
         BindListener(_event, EventTriggerType.PointerClick, OnEventClick);
         BindListener(_event, EventTriggerType.PointerEnter, OnEventEnter);
         BindListener(_event, EventTriggerType.PointerExit, OnEventExit);
@@ -62,17 +69,15 @@ public class ItemSlot : ChildBaseWindow
         BindListener(_event, EventTriggerType.BeginDrag, OnEventBeginDrag);
         BindListener(_event, EventTriggerType.EndDrag, OnEventEndDrag);
         BindListener(_event, EventTriggerType.Scroll, OnEventScroll);
+
         #endregion 变量绑定
     }
 
 
     #region 变量方法
+
     private void OnEventClick(BaseEventData targetObj)
     {
-        if (_drag)
-        {
-            return;
-        }
     }
 
     private void OnEventEnter(BaseEventData targetObj)
@@ -104,9 +109,9 @@ public class ItemSlot : ChildBaseWindow
 
 
         ListenerFrameComponent.Instance.personalBelongings.SetDragItemSlot(this);
+        RemoveItemEvent?.Invoke(this, item);
         item = null;
         UpdateItemUI();
-        RemoveItemEvent?.Invoke();
     }
 
     private void OnEventUp(BaseEventData targetObj)
@@ -145,6 +150,7 @@ public class ItemSlot : ChildBaseWindow
     }
 
     #endregion 变量方法
+
     [LabelText("检测物品是否合格")]
     public bool CheckItemQualified(Item item)
     {
@@ -176,12 +182,12 @@ public class ItemSlot : ChildBaseWindow
     {
         if (this.item != null)
         {
-            RemoveItemEvent?.Invoke();
+            RemoveItemEvent?.Invoke(this, item);
         }
 
         this.item = item;
         UpdateItemUI();
-        PlaceItemEvent?.Invoke(this.item);
+        PlaceItemEvent?.Invoke(this, this.item);
     }
 
     //更新UI

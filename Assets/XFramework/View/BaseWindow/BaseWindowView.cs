@@ -132,7 +132,6 @@ namespace XFramework
         /// </summary>
         public virtual void OnViewDestroy()
         {
-            RemoveAllListenerEvent();
             RemoveThisView();
             RemoveTimeTask();
         }

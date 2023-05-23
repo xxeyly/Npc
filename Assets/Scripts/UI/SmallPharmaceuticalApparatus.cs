@@ -3,7 +3,9 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+
 #endregion 引入
+
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -14,6 +16,7 @@ using XFramework;
 public class SmallPharmaceuticalApparatus : BaseWindow
 {
     #region 变量声明
+
     private Button _windowMoveEvent;
     private Button _close;
     private List<ItemSlot> _itemSlotContent;
@@ -29,6 +32,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
     private TextMeshProUGUI _temperatureValue;
 
     #endregion 变量声明
+
     [SerializeField] [LabelText("移动布局")] private bool moveWindow;
     [BoxGroup("水量")] [LabelText("移动偏移")] private Vector3 _moveOffset;
 
@@ -152,7 +156,8 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     protected override void InitView()
     {
-       #region 变量查找
+        #region 变量查找
+
         BindUi(ref _windowMoveEvent, "Title/WindowMoveEvent");
         BindUi(ref _close, "Title/Close");
         BindUi(ref _itemSlotContent, "ItemSlotContent");
@@ -171,7 +176,9 @@ public class SmallPharmaceuticalApparatus : BaseWindow
         BindUi(ref _increaseTemperature, "TemperaturePanel/IncreaseTemperature");
         BindUi(ref _reduceTemperature, "TemperaturePanel/ReduceTemperature");
         BindUi(ref _temperatureValue, "TemperaturePanel/TemperatureValue");
+
         #endregion 变量查找
+
         BindUi(ref _waterTank, "WaterPanel/WaterTank");
         BindUi(ref _energyTank, "EnergyPanel/EnergyTank");
         BindUi(ref _produce, "ProducePanel/Produce");
@@ -190,17 +197,19 @@ public class SmallPharmaceuticalApparatus : BaseWindow
     protected override void InitListener()
     {
         #region 变量绑定
+
         BindListener(_windowMoveEvent, EventTriggerType.PointerDown, OnWindowMoveEventDown);
         BindListener(_windowMoveEvent, EventTriggerType.PointerUp, OnWindowMoveEventUp);
         BindListener(_close, EventTriggerType.PointerClick, OnCloseClick);
         BindListener(_increaseWater, EventTriggerType.PointerClick, OnIncreaseWaterClick);
         BindListener(_increaseTemperature, EventTriggerType.PointerClick, OnIncreaseTemperatureClick);
         BindListener(_reduceTemperature, EventTriggerType.PointerClick, OnReduceTemperatureClick);
+
         #endregion 变量绑定
-        AddListenerEvent("InitStorageItem", InitStorageItem);
     }
 
     #region 变量方法
+
     private void OnWindowMoveEventDown(BaseEventData targetObj)
     {
         ListenerFrameComponent.Instance.itemAttributeShow.HideItemAttribute();
@@ -315,29 +324,30 @@ public class SmallPharmaceuticalApparatus : BaseWindow
             EnergyReset();
         }
     }
+
     #endregion 变量方法
 
     #region 自定义属性
 
     #endregion 自定义属性
 
-    private void WaterTankPlaceItemEvent(Item item)
+    private void WaterTankPlaceItemEvent(ItemSlot itemSlot, Item item)
     {
         Debug.Log("放入");
     }
 
-    private void WaterTankRemoveItemEvent()
+    private void WaterTankRemoveItemEvent(ItemSlot itemSlot, Item item)
     {
         Debug.Log("拿出");
     }
 
-    private void EnergyTankRemoveItemEvent()
+    private void EnergyTankRemoveItemEvent(ItemSlot itemSlot, Item item)
     {
         currentEnergy = 0;
         _currentEnergyValue.text = currentEnergy.ToString();
     }
 
-    private void EnergyTankPlaceItemEvent(Item item)
+    private void EnergyTankPlaceItemEvent(ItemSlot itemSlot, Item item)
     {
         currentEnergy = 0;
         foreach (AttributeValue attributeValue in item.attributeValueList)
@@ -561,6 +571,7 @@ public class SmallPharmaceuticalApparatus : BaseWindow
             });
         }
     }
+
     [AddListenerEvent]
     private void InitStorageItem()
     {
@@ -570,13 +581,16 @@ public class SmallPharmaceuticalApparatus : BaseWindow
 
     private void Save()
     {
-        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = SaveSmallPharmaceuticalApparatusSaveDataGroup(currentWater, incrementWater, waterMax, currentTemperature, temperatureMax, currentEnergy, temperatureConversionRatio, everyTimeBurningMultiple,
+        SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = SaveSmallPharmaceuticalApparatusSaveDataGroup(currentWater, incrementWater, waterMax, currentTemperature, temperatureMax, currentEnergy,
+            temperatureConversionRatio, everyTimeBurningMultiple,
             _energyBurningTimeTask, _energyBurningEndTimeTask, _waterTank, _produce, _energyTank, attributeCompositionDurationDict, combustionInterval, currentCombustionTime, _itemSlotContent);
         ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SaveSmallPharmaceuticalApparatusSaveDataGroup(1, smallPharmaceuticalApparatusSaveDataGroup);
     }
 
-    private SmallPharmaceuticalApparatusSaveDataGroup SaveSmallPharmaceuticalApparatusSaveDataGroup(int currentWater, int incrementWater, int waterMax, int currentTemperature, int temperatureMax, float currentEnergy, int temperatureConversionRatio, int everyTimeBurningMultiple,
-        int energyBurningTimeTask, int energyBurningEndTimeTask, ItemSlot waterTank, ItemSlot produce, ItemSlot energyTank, Dictionary<AttributeComposition, int> attributeCompositionDurationDict, int combustionInterval, float currentCombustionTime, List<ItemSlot> itemSlot)
+    private SmallPharmaceuticalApparatusSaveDataGroup SaveSmallPharmaceuticalApparatusSaveDataGroup(int currentWater, int incrementWater, int waterMax, int currentTemperature, int temperatureMax, float currentEnergy,
+        int temperatureConversionRatio, int everyTimeBurningMultiple,
+        int energyBurningTimeTask, int energyBurningEndTimeTask, ItemSlot waterTank, ItemSlot produce, ItemSlot energyTank, Dictionary<AttributeComposition, int> attributeCompositionDurationDict, int combustionInterval,
+        float currentCombustionTime, List<ItemSlot> itemSlot)
     {
         SmallPharmaceuticalApparatusSaveDataGroup smallPharmaceuticalApparatusSaveDataGroup = ScriptableObject.CreateInstance<SmallPharmaceuticalApparatusSaveDataGroup>();
         smallPharmaceuticalApparatusSaveDataGroup.currentWater = currentWater;

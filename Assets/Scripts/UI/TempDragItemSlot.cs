@@ -58,13 +58,6 @@ public class TempDragItemSlot : BaseWindow
         #region 变量绑定
 
         #endregion 变量绑定
-
-        AddListenerEvent<ItemSlot>("SetDragItemSlot", SetDragItemSlot);
-        AddListenerEvent("RemoveDragItemSlot", RemoveDragItemSlot);
-        AddListenerEvent<ItemSlot>("SetEnterItemSlot", SetEnterItemSlot);
-        AddListenerEvent("SetEnterItemSlotNull", SetEnterItemSlotNull);
-
-        AddReturnListenerEvent<bool>("GetDragSate", GetDragSate);
     }
 
 

@@ -33,8 +33,9 @@ namespace XFramework
         [MenuItem("Xframe/监听生成 &l")]
         private static void OnListenerGenerate()
         {
-            ListenerComponentGenerateData listenerComponentGenerateData = new ListenerComponentGenerateData();
-            listenerComponentGenerateData.OnGenerate();
+            /*ListenerComponentGenerateData listenerComponentGenerateData = new ListenerComponentGenerateData();
+            listenerComponentGenerateData.OnGenerate();*/
+            GenerateListenerComponent.GenerateListener();
         }
 
         [MenuItem("Xframe/生成代码配置")]

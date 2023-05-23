@@ -149,10 +149,6 @@ public class AtlasSceneComponent : SceneComponent
 
     public override void StartComponent()
     {
-        AddReturnListenerEvent<Item, bool>("GetItemUnlocking", GetItemUnlocking);
-        AddReturnListenerEvent<int, Item>("CreateItemByItemId", CreateItemByItemId);
-        AddReturnListenerEvent<ItemAtlas>("GetItemAtlas", GetItemAtlas);
-        AddReturnListenerEvent<List<Item>>("GetUnlockingItem", GetUnlockingItem);
     }
 
 

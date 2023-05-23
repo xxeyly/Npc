@@ -3,7 +3,9 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+
 #endregion 引入
+
 using System;
 using System.Collections.Generic;
 using LitJson;
@@ -14,6 +16,7 @@ using XFramework;
 public class PersonalBelongings : BaseWindow
 {
     #region 变量声明
+
     private TextMeshProUGUI _maxCount;
     private TextMeshProUGUI _currentCount;
     private ScrollRect _itemSlotScrollView;
@@ -23,6 +26,7 @@ public class PersonalBelongings : BaseWindow
     private Button _close;
 
     #endregion 变量声明
+
     [SerializeField] [LabelText("移动布局")] private bool moveWindow;
     [LabelText("移动偏移")] private Vector3 _moveOffset;
     [LabelText("当前物品数量")] private int _currentItemCount = 0;
@@ -33,7 +37,8 @@ public class PersonalBelongings : BaseWindow
 
     protected override void InitView()
     {
-       #region 变量查找
+        #region 变量查找
+
         BindUi(ref _maxCount, "MaxCount");
         BindUi(ref _currentCount, "MaxCount/CurrentCount");
         BindUi(ref _itemSlotScrollView, "ItemSlotScrollView");
@@ -46,7 +51,9 @@ public class PersonalBelongings : BaseWindow
 
         BindUi(ref _windowMoveEvent, "Title/WindowMoveEvent");
         BindUi(ref _close, "Title/Close");
+
         #endregion 变量查找
+
         for (int i = 0; i < _itemSlotContent.Count; i++)
         {
             _itemSlotContent[i].InitScrollRect(_itemSlotScrollView);
@@ -59,17 +66,16 @@ public class PersonalBelongings : BaseWindow
     protected override void InitListener()
     {
         #region 变量绑定
+
         BindListener(_windowMoveEvent, EventTriggerType.PointerDown, OnWindowMoveEventDown);
         BindListener(_windowMoveEvent, EventTriggerType.PointerUp, OnWindowMoveEventUp);
         BindListener(_close, EventTriggerType.PointerClick, OnCloseClick);
+
         #endregion 变量绑定
-        AddListenerEvent("InitStorageItem", InitStorageItem);
-        AddReturnListenerEvent<Item, bool>("AddItem", AddItem);
-        AddListenerEvent<ItemSlot>("SetDragItemSlot", SetDragItemSlot);
-        AddListenerEvent("RemoveDragItemSlot", RemoveDragItemSlot);
     }
 
     #region 变量方法
+
     private void OnWindowMoveEventDown(BaseEventData targetObj)
     {
         ListenerFrameComponent.Instance.itemAttributeShow.HideItemAttribute();
@@ -88,11 +94,13 @@ public class PersonalBelongings : BaseWindow
     {
         HideThisView();
     }
+
     #endregion 变量方法
 
     #region 自定义属性
 
     #endregion 自定义属性
+
     protected override void Update()
     {
         base.Update();
@@ -101,6 +109,7 @@ public class PersonalBelongings : BaseWindow
             window.transform.position = Input.mousePosition + _moveOffset;
         }
     }
+
     [AddListenerEvent]
     private void InitStorageItem()
     {
@@ -113,19 +122,19 @@ public class PersonalBelongings : BaseWindow
         _maxCount.text = "/" + _itemSlotContent.Count.ToString();
     }
 
-    private void ItemSlotRemoveItemEvent()
+    private void ItemSlotRemoveItemEvent(ItemSlot itemSlot, Item item)
     {
         _currentItemCount -= 1;
         _currentCount.text = _currentItemCount.ToString();
     }
 
-    private void ItemSlotPlaceItemEvent(Item item)
+    private void ItemSlotPlaceItemEvent(ItemSlot itemSlot, Item item)
     {
         _currentItemCount += 1;
         _currentCount.text = _currentItemCount.ToString();
     }
 
-    [Button][AddListenerEvent]
+    [AddListenerEvent]
     private bool AddItem(Item item)
     {
         item = item.GetNewItem();
@@ -141,6 +150,7 @@ public class PersonalBelongings : BaseWindow
         return false;
     }
 
+    [AddListenerEvent]
     private bool AddItem(Item item, int itemSlotIndex)
     {
         foreach (ItemSlot itemSlot in _itemSlotContent)
@@ -159,13 +169,15 @@ public class PersonalBelongings : BaseWindow
     }
 
 
-    [LabelText("设置拖拽物品格子")][AddListenerEvent]
+    [LabelText("设置拖拽物品格子")]
+    [AddListenerEvent]
     private void SetDragItemSlot(ItemSlot itemSlot)
     {
         ListenerFrameComponent.Instance.tempDragItemSlot.SetDragItemSlot(itemSlot);
     }
 
-    [LabelText("移除拖拽物品格子")][AddListenerEvent]
+    [LabelText("移除拖拽物品格子")]
+    [AddListenerEvent]
     private void RemoveDragItemSlot()
     {
         ListenerFrameComponent.Instance.tempDragItemSlot.RemoveDragItemSlot();

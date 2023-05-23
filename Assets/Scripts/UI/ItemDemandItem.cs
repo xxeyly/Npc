@@ -27,8 +27,7 @@ public class ItemDemandItem : ChildBaseWindow
 
     [LabelText("当前物品状态")] public ItemDemandItemType itemDemandItemType = ItemDemandItemType.无;
 
-    [FormerlySerializedAs("DemandItem")] [LabelText("需求物品")]
-    public Item demandItem;
+    [LabelText("需求物品")] public Item demandItem;
 
     [LabelText("是否被选中")] public bool isSelect;
 

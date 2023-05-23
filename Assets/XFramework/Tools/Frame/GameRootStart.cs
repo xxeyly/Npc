@@ -18,12 +18,12 @@ namespace XFramework
         [BoxGroup("场景加载")] [LabelText("初始化跳转场景名称")]
         public string initJumpSceneName;
 
-        [BoxGroup("场景加载")] [LabelText("加载场景")] public Scene loadScene;
+        [BoxGroup("场景加载")] [LabelText("场景")] public Scene loadScene;
 
-        [BoxGroup("框架场景组件")] [LabelText("框架场景组件-不摧毁")] [Searchable]
-        public List<SceneComponent> frameSceneComponents = new List<SceneComponent>();
+        [BoxGroup("框架场景组件-不摧毁")] [LabelText("框架场景组件")] [Searchable]
+        public List<SceneComponent> dontDestroyFrameSceneComponents = new List<SceneComponent>();
 
-        [BoxGroup("框架场景组件")] [LabelText("框架场景初始化组件-不摧毁")] [Searchable]
+        [BoxGroup("框架场景组件-不摧毁")] [LabelText("框架场景初始化组件")] [Searchable]
         public List<SceneComponentInit> frameSceneInitStartSingletons = new List<SceneComponentInit>();
 
         [BoxGroup("实时场景组件")] [LabelText("场景组件")] [Searchable]
@@ -66,18 +66,14 @@ namespace XFramework
             }
 
             DontDestroyOnLoad(this);
+            dontDestroyOnLoad = true;
             Instance = GetComponent<GameRootStart>();
-            List<FrameComponent> frameComponents = DataFrameComponent.GetAllObjectsInScene<FrameComponent>();
-            foreach (Type type in General.frameComponentType)
+            Debug.Log(gameObject.scene.name);
+            Debug.Log("框架初始化");
+            frameComponent = DataFrameComponent.GetAllObjectsInScene<FrameComponent>("DontDestroyOnLoad");
+            for (int i = 0; i < frameComponent.Count; i++)
             {
-                foreach (FrameComponent component in frameComponents)
-                {
-                    if (component.GetType() == type)
-                    {
-                        frameComponent.Add(component);
-                        break;
-                    }
-                }
+                frameComponent[i].FrameInitComponent();
             }
 
             if (hotFixLoad)
@@ -86,46 +82,30 @@ namespace XFramework
                 hotFixAssetAssetBundleSceneConfigs = JsonMapper.ToObject<List<HotFixAssetAssetBundleSceneConfig>>(hotFixAssetConfig);
             }
 
-            Debug.Log("框架初始化");
-            FrameComponentStart();
-            FrameComponentSceneInit();
             Debug.Log("框架初始化完毕");
-            dontDestroyOnLoad = true;
             //框架组件开启
 
-            frameSceneComponents = new List<SceneComponent>(GetComponentsInChildren<SceneComponent>());
-            for (int i = 0; i < frameSceneComponents.Count; i++)
+            dontDestroyFrameSceneComponents = DataFrameComponent.GetAllObjectsInScene<SceneComponent>("DontDestroyOnLoad");
+            for (int i = 0; i < dontDestroyFrameSceneComponents.Count; i++)
             {
-                if (!sceneComponents.Contains(frameSceneComponents[i]))
-                {
-                    if (frameLoadLog)
-                    {
-                        Debug.Log("框架SceneComponent:" + frameSceneComponents[i].GetType());
-                    }
-
-                    frameSceneComponents[i].StartComponent();
-                }
+                dontDestroyFrameSceneComponents[i].StartComponent();
             }
 
-            frameSceneInitStartSingletons = new List<SceneComponentInit>(GetComponentsInChildren<SceneComponentInit>());
+            Debug.Log("不摧毁的SceneComponent加载完毕");
+
+            frameSceneInitStartSingletons = DataFrameComponent.GetAllObjectsInScene<SceneComponentInit>("DontDestroyOnLoad");
             for (int i = 0; i < frameSceneInitStartSingletons.Count; i++)
             {
-                if (!sceneInitStartSingletons.Contains(frameSceneInitStartSingletons[i]))
-                {
-                    if (frameLoadLog)
-                    {
-                        Debug.Log("框架SceneComponentInit:" + frameSceneInitStartSingletons[i].GetType());
-                    }
-
-                    frameSceneInitStartSingletons[i].InitComponent();
-                }
+                frameSceneInitStartSingletons[i].InitComponent();
             }
+
+            Debug.Log("不摧毁的SceneComponentInit加载完毕");
 
             if (initJump)
             {
                 Debug.Log("初始场景跳转");
-                SceneLoadFrameComponent.Instance.SceneLoad(initJumpSceneName, LoadSceneMode.Additive);
-                Destroy(GetComponent<AudioListener>());
+                SceneLoadFrameComponent.Instance.SceneLoad(initJumpSceneName);
+                DestroyImmediate(GetComponent<AudioListener>());
             }
 
             SceneManager.sceneLoaded += SceneLoadOverCallBack;
@@ -154,7 +134,6 @@ namespace XFramework
         /// <param name="sceneType"></param>
         private void SceneLoadOverCallBack(Scene scene, LoadSceneMode sceneType)
         {
-            SceneLoadFrameComponent.Instance.sceneName = scene.name;
             loadScene = scene;
             InitSceneStartSingletons(scene);
         }
@@ -187,7 +166,7 @@ namespace XFramework
             HotFixAssetAssetBundleSceneConfig currentSceneHotFixAssetAssetBundleSceneConfig = null;
             foreach (HotFixAssetAssetBundleSceneConfig hotFixAssetAssetBundleSceneConfig in hotFixAssetAssetBundleSceneConfigs)
             {
-                if (hotFixAssetAssetBundleSceneConfig.sceneHotFixAssetAssetBundleAssetConfig.assetBundleName == DataFrameComponent.AllCharToLower(SceneLoadFrameComponent.Instance.sceneName))
+                if (hotFixAssetAssetBundleSceneConfig.sceneHotFixAssetAssetBundleAssetConfig.assetBundleName == DataFrameComponent.AllCharToLower(loadScene.name))
                 {
                     currentSceneHotFixAssetAssetBundleSceneConfig = hotFixAssetAssetBundleSceneConfig;
                     break;
@@ -236,6 +215,7 @@ namespace XFramework
         //场景加载前准备
         public void SceneBeforeLoadPrepare(string destroySceneName)
         {
+            Debug.Log(destroySceneName);
             //视图摧毁
             ViewFrameComponent.Instance.AllViewDestroy(destroySceneName);
             //计时器初始化
@@ -248,7 +228,6 @@ namespace XFramework
             {
                 if (sceneComponents.Contains(sceneComponent))
                 {
-                    sceneComponent.RemoveAllListenerEvent();
                     sceneComponent.EndComponent();
                     sceneComponents.Remove(sceneComponent);
                 }
@@ -260,7 +239,6 @@ namespace XFramework
             {
                 if (sceneInitStartSingletons.Contains(sceneComponentInit))
                 {
-                    sceneComponentInit.RemoveAllListenerEvent();
                     sceneInitStartSingletons.Remove(sceneComponentInit);
                 }
             }
@@ -282,7 +260,7 @@ namespace XFramework
 
 
         [LabelText("开启框架组件")]
-        private void FrameComponentStart()
+        private void FrameComponentInit()
         {
             for (int i = 0; i < frameComponent.Count; i++)
             {
@@ -300,32 +278,22 @@ namespace XFramework
         }
 
         [LabelText("开启场景组件")]
-        private void SceneComponentStart(Scene scene)
+        public void SceneComponentStart(Scene scene)
         {
-            List<SceneComponent> tempSceneComponent = DataFrameComponent.GetAllObjectsInScene<SceneComponent>(scene.name);
-            for (int i = 0; i < tempSceneComponent.Count; i++)
+            sceneComponents = DataFrameComponent.GetAllObjectsInScene<SceneComponent>(scene.name);
+            for (int i = 0; i < sceneComponents.Count; i++)
             {
-                if (!sceneComponents.Contains(tempSceneComponent[i]))
-                {
-                    // Debug.Log(tempSceneComponent[i].GetType());
-                    sceneComponents.Add(tempSceneComponent[i]);
-                    tempSceneComponent[i].StartComponent();
-                }
+                sceneComponents[i].StartComponent();
             }
         }
 
         [LabelText("开启场景初始化组件")]
-        private void SceneComponentInitStart(Scene scene)
+        public void SceneComponentInitStart(Scene scene)
         {
-            List<SceneComponentInit> tempSceneComponentInit = DataFrameComponent.GetAllObjectsInScene<SceneComponentInit>(scene.name);
-            for (int i = 0; i < tempSceneComponentInit.Count; i++)
+            sceneInitStartSingletons = DataFrameComponent.GetAllObjectsInScene<SceneComponentInit>(scene.name);
+            for (int i = 0; i < sceneInitStartSingletons.Count; i++)
             {
-                if (!sceneInitStartSingletons.Contains(tempSceneComponentInit[i]))
-                {
-                    // Debug.Log(tempSceneComponentInit[i].GetType());
-                    sceneInitStartSingletons.Add(tempSceneComponentInit[i]);
-                    tempSceneComponentInit[i].InitComponent();
-                }
+                sceneInitStartSingletons[i].InitComponent();
             }
         }
 

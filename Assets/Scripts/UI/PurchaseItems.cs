@@ -1,7 +1,9 @@
 #region 引入
+
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+
 #endregion 引入
 
 using System;
@@ -13,20 +15,25 @@ using XFramework;
 public class PurchaseItems : BaseWindow
 {
     #region 变量声明
+
     private Button _windowMoveEvent;
     private Button _close;
-    private ScrollRect _attributesDemand;
-    private GameObject _purchaseItemsRequiredAttributesContent;
-    private Button _remove;
     private ScrollRect _itemDemand;
     private List<ItemDemandItem> _itemSlotContent;
+    private GameObject _purchaseData;
     private GameObject _tip;
+    private ScrollRect _attributesDemand;
+    private GameObject _purchaseItemsRequiredAttributesContent;
+    private ScrollRect _exchangeItems;
+    private List<ItemSlot> _exchangeItemsContent;
+    private Button _remove;
+
     #endregion 变量声明
 
     [LabelText("属性预制体体")] public GameObject purchaseItemsRequiredAttributesObj;
     [LabelText("属性列表")] public List<PurchaseItemsRequiredAttributes> purchaseItemsRequiredAttributesList;
     [SerializeField] [LabelText("当前操作")] private ItemDemandItem currentOperationItemDemandItem;
-    [LabelText("收购物品数据")] [SerializeField] private Dictionary<ItemDemandItem, Dictionary<AttributeValue, Vector2>> itemDemandItemData = new Dictionary<ItemDemandItem, Dictionary<AttributeValue, Vector2>>();
+    [LabelText("收购物品数据")] [SerializeField] private Dictionary<ItemDemandItem, ItemDemandItemData> itemDemandItemDataDic = new Dictionary<ItemDemandItem, ItemDemandItemData>();
 
     [BoxGroup("界面移动")] [SerializeField] [LabelText("移动布局")]
     private bool moveWindow;
@@ -40,37 +47,64 @@ public class PurchaseItems : BaseWindow
     protected override void InitView()
     {
         #region 变量查找
-        BindUi(ref _windowMoveEvent,"Title/WindowMoveEvent");
-        BindUi(ref _close,"Title/Close");
-        BindUi(ref _attributesDemand,"AttributesDemand");
-        BindUi(ref _purchaseItemsRequiredAttributesContent,"AttributesDemand/Viewport/PurchaseItemsRequiredAttributesContent");
-        BindUi(ref _remove,"AttributesDemand/Remove");
-        BindUi(ref _itemDemand,"ItemDemand");
-        BindUi(ref _itemSlotContent,"ItemDemand/Viewport/ItemSlotContent");
+
+        BindUi(ref _windowMoveEvent, "Title/WindowMoveEvent");
+        BindUi(ref _close, "Title/Close");
+        BindUi(ref _itemDemand, "ItemDemand");
+        BindUi(ref _itemSlotContent, "ItemDemand/Viewport/ItemSlotContent");
         for (int i = 0; i < _itemSlotContent.Count; i++)
         {
             _itemSlotContent[i].ViewStartInit();
             _itemSlotContent[i].InitData(i);
         }
-        BindUi(ref _tip,"Tip");
+
+        BindUi(ref _purchaseData, "PurchaseData");
+        BindUi(ref _tip, "PurchaseData/Tip");
+        BindUi(ref _attributesDemand, "PurchaseData/AttributesDemand");
+        BindUi(ref _purchaseItemsRequiredAttributesContent, "PurchaseData/AttributesDemand/Viewport/PurchaseItemsRequiredAttributesContent");
+        BindUi(ref _exchangeItems, "PurchaseData/ExchangeItems");
+        BindUi(ref _exchangeItemsContent, "PurchaseData/ExchangeItems/Viewport/ExchangeItemsContent");
+        for (int i = 0; i < _exchangeItemsContent.Count; i++)
+        {
+            _exchangeItemsContent[i].ViewStartInit();
+            _exchangeItemsContent[i].InitData(i);
+        }
+
+        BindUi(ref _remove, "PurchaseData/Remove");
+
         #endregion 变量查找
+
+        for (int i = 0; i < _exchangeItemsContent.Count; i++)
+        {
+            _exchangeItemsContent[i].PlaceItemEvent += OnPlaceItemEvent;
+            _exchangeItemsContent[i].RemoveItemEvent += OnRemoveItemEvent;
+        }
+    }
+
+    private void OnRemoveItemEvent(ItemSlot itemSlot, Item item)
+    {
+        Debug.Log(itemSlot.name + "移除物品:" + item.ItemName);
+    }
+
+    private void OnPlaceItemEvent(ItemSlot itemSlot, Item item)
+    {
+        Debug.Log(itemSlot.name + "增加物品:" + item.ItemName);
     }
 
     protected override void InitListener()
     {
         #region 变量绑定
-        BindListener(_windowMoveEvent,EventTriggerType.PointerDown,OnWindowMoveEventDown);
-        BindListener(_windowMoveEvent,EventTriggerType.PointerUp,OnWindowMoveEventUp);
-        BindListener(_close,EventTriggerType.PointerClick,OnCloseClick);
-        BindListener(_remove,EventTriggerType.PointerClick,OnRemoveClick);
-        #endregion 变量绑定
 
-        AddListenerEvent<int>("AddNewItem", AddNewItem);
-        AddListenerEvent<int>("OnSelect", OnSelect);
-        AddListenerEvent<ItemDemandItem, AttributeValue, Vector2>("OnEditorAttributeValue", OnEditorAttributeValue);
+        BindListener(_windowMoveEvent, EventTriggerType.PointerDown, OnWindowMoveEventDown);
+        BindListener(_windowMoveEvent, EventTriggerType.PointerUp, OnWindowMoveEventUp);
+        BindListener(_close, EventTriggerType.PointerClick, OnCloseClick);
+        BindListener(_remove, EventTriggerType.PointerClick, OnRemoveClick);
+
+        #endregion 变量绑定
     }
 
     #region 变量方法
+
     private void OnWindowMoveEventDown(BaseEventData targetObj)
     {
         ListenerFrameComponent.Instance.itemAttributeShow.HideItemAttribute();
@@ -78,15 +112,18 @@ public class PurchaseItems : BaseWindow
         _moveOffset = window.transform.position - Input.mousePosition;
         moveWindow = true;
     }
+
     private void OnWindowMoveEventUp(BaseEventData targetObj)
     {
         moveWindow = false;
         ListenerFrameComponent.Instance.itemAttributeShow.SetWindowDrag(false);
     }
+
     private void OnCloseClick(BaseEventData targetObj)
     {
         HideThisView();
     }
+
     private void OnRemoveClick(BaseEventData targetObj)
     {
         if (currentOperationItemDemandItem == null)
@@ -98,11 +135,12 @@ public class PurchaseItems : BaseWindow
         DisPlayObj(true, _tip);
         //设置为空
         currentOperationItemDemandItem.SetNull();
-        if (itemDemandItemData.ContainsKey(currentOperationItemDemandItem))
+        if (itemDemandItemDataDic.ContainsKey(currentOperationItemDemandItem))
         {
-            itemDemandItemData.Remove(currentOperationItemDemandItem);
+            itemDemandItemDataDic.Remove(currentOperationItemDemandItem);
         }
     }
+
     #endregion 变量方法
 
     #region 自定义属性
@@ -121,7 +159,7 @@ public class PurchaseItems : BaseWindow
     //显示当前物品的所有属性数据
     private void ShowItemAttributes()
     {
-        DisPlayObj(true, _attributesDemand.gameObject);
+        DisPlayObj(true, _attributesDemand.gameObject, _exchangeItems.gameObject, _remove.gameObject);
         DisPlayObj(false, _tip.gameObject);
         //清空当前属性
         foreach (PurchaseItemsRequiredAttributes purchaseItemsRequiredAttributes in purchaseItemsRequiredAttributesList)
@@ -132,15 +170,15 @@ public class PurchaseItems : BaseWindow
         purchaseItemsRequiredAttributesList.Clear();
         //增加当前物品的属性
         //获得当前属性
-        if (itemDemandItemData.ContainsKey(currentOperationItemDemandItem))
+        if (itemDemandItemDataDic.ContainsKey(currentOperationItemDemandItem))
         {
-            Dictionary<AttributeValue, Vector2> tempAttributeValueData = itemDemandItemData[currentOperationItemDemandItem];
+            ItemDemandItemData itemDemandItemData = itemDemandItemDataDic[currentOperationItemDemandItem];
             foreach (AttributeValue attributeValue in currentOperationItemDemandItem.demandItem.attributeValueList)
             {
                 GameObject requiredAttributesObj = Instantiate(purchaseItemsRequiredAttributesObj, _purchaseItemsRequiredAttributesContent.transform);
                 PurchaseItemsRequiredAttributes tempPurchaseItemsRequiredAttributes = requiredAttributesObj.GetComponent<PurchaseItemsRequiredAttributes>();
                 tempPurchaseItemsRequiredAttributes.ViewStartInit();
-                tempPurchaseItemsRequiredAttributes.SetAttributes(currentOperationItemDemandItem, attributeValue, tempAttributeValueData[attributeValue]);
+                tempPurchaseItemsRequiredAttributes.SetAttributes(currentOperationItemDemandItem, attributeValue, itemDemandItemData.attributeValue[attributeValue]);
                 purchaseItemsRequiredAttributesList.Add(tempPurchaseItemsRequiredAttributes);
             }
         }
@@ -150,7 +188,8 @@ public class PurchaseItems : BaseWindow
         }
     }
 
-    [LabelText("新增需求物品")][AddListenerEvent]
+    [LabelText("新增需求物品")]
+    [AddListenerEvent]
     private void AddNewItem(int itemIndex)
     {
         foreach (ItemDemandItem itemDemandItem in _itemSlotContent)
@@ -169,7 +208,8 @@ public class PurchaseItems : BaseWindow
         ShowView(typeof(ItemAtlasDisplay));
     }
 
-    [LabelText("选中已有物品")][AddListenerEvent]
+    [LabelText("选中已有物品")]
+    [AddListenerEvent]
     private void OnSelect(int itemIndex)
     {
         foreach (ItemDemandItem itemDemandItem in _itemSlotContent)
@@ -196,8 +236,9 @@ public class PurchaseItems : BaseWindow
         ListenerFrameComponent.Instance.itemAtlasDisplay.SetSelectItemState(false);
         ListenerFrameComponent.Instance.itemAtlasDisplay.RemoveSelectItemDelegate(OnReceiveAtlasItem);
         //记录新物品数据
-        if (!itemDemandItemData.ContainsKey(currentOperationItemDemandItem))
+        if (!itemDemandItemDataDic.ContainsKey(currentOperationItemDemandItem))
         {
+            ItemDemandItemData itemDemandItemData = new ItemDemandItemData();
             Dictionary<AttributeValue, Vector2> tempAttributeValueData = new Dictionary<AttributeValue, Vector2>();
 
             foreach (AttributeValue attributeValue in item.attributeValueList)
@@ -205,7 +246,9 @@ public class PurchaseItems : BaseWindow
                 tempAttributeValueData.Add(attributeValue, Vector2.zero);
             }
 
-            itemDemandItemData.Add(currentOperationItemDemandItem, tempAttributeValueData);
+            itemDemandItemData.attributeValue = tempAttributeValueData;
+
+            itemDemandItemDataDic.Add(currentOperationItemDemandItem, itemDemandItemData);
         }
         else
         {
@@ -218,9 +261,18 @@ public class PurchaseItems : BaseWindow
         OnSelect(currentOperationItemDemandItem.itemIndex);
     }
 
-    [LabelText("修改属性值")][AddListenerEvent]
+    [LabelText("修改属性值")]
+    [AddListenerEvent]
     private void OnEditorAttributeValue(ItemDemandItem itemDemandItem, AttributeValue attributeValue, Vector2 value)
     {
-        itemDemandItemData[itemDemandItem][attributeValue] = value;
+        itemDemandItemDataDic[itemDemandItem].attributeValue[attributeValue] = value;
+    }
+
+    [Serializable]
+    [LabelText("收购数据")]
+    public class ItemDemandItemData
+    {
+        [LabelText("所需物品属性")] public Dictionary<AttributeValue, Vector2> attributeValue = new Dictionary<AttributeValue, Vector2>();
+        [LabelText("交换物品")] private List<Item> exchangeItems = new List<Item>();
     }
 }
