@@ -83,12 +83,12 @@ public class PurchaseItems : BaseWindow
 
     private void OnRemoveItemEvent(ItemSlot itemSlot, Item item)
     {
-        Debug.Log(itemSlot.name + "移除物品:" + item.ItemName);
+        itemDemandItemDataDic[currentOperationItemDemandItem].exchangeItems[itemSlot.itemIndex] = null;
     }
 
     private void OnPlaceItemEvent(ItemSlot itemSlot, Item item)
     {
-        Debug.Log(itemSlot.name + "增加物品:" + item.ItemName);
+        itemDemandItemDataDic[currentOperationItemDemandItem].exchangeItems[itemSlot.itemIndex] = item;
     }
 
     protected override void InitListener()
@@ -173,6 +173,7 @@ public class PurchaseItems : BaseWindow
         if (itemDemandItemDataDic.ContainsKey(currentOperationItemDemandItem))
         {
             ItemDemandItemData itemDemandItemData = itemDemandItemDataDic[currentOperationItemDemandItem];
+            //遍历当前物体的属性
             foreach (AttributeValue attributeValue in currentOperationItemDemandItem.demandItem.attributeValueList)
             {
                 GameObject requiredAttributesObj = Instantiate(purchaseItemsRequiredAttributesObj, _purchaseItemsRequiredAttributesContent.transform);
@@ -180,6 +181,11 @@ public class PurchaseItems : BaseWindow
                 tempPurchaseItemsRequiredAttributes.ViewStartInit();
                 tempPurchaseItemsRequiredAttributes.SetAttributes(currentOperationItemDemandItem, attributeValue, itemDemandItemData.attributeValue[attributeValue]);
                 purchaseItemsRequiredAttributesList.Add(tempPurchaseItemsRequiredAttributes);
+            }
+
+            foreach (ItemSlot itemSlot in _exchangeItemsContent)
+            {
+                itemSlot.AddItem(itemDemandItemData.exchangeItems[itemSlot.itemIndex]);
             }
         }
         else
@@ -247,6 +253,10 @@ public class PurchaseItems : BaseWindow
             }
 
             itemDemandItemData.attributeValue = tempAttributeValueData;
+            for (int i = 0; i < _exchangeItemsContent.Count; i++)
+            {
+                itemDemandItemData.exchangeItems.Add(null);
+            }
 
             itemDemandItemDataDic.Add(currentOperationItemDemandItem, itemDemandItemData);
         }
@@ -273,6 +283,6 @@ public class PurchaseItems : BaseWindow
     public class ItemDemandItemData
     {
         [LabelText("所需物品属性")] public Dictionary<AttributeValue, Vector2> attributeValue = new Dictionary<AttributeValue, Vector2>();
-        [LabelText("交换物品")] private List<Item> exchangeItems = new List<Item>();
+        [LabelText("交换物品")] public List<Item> exchangeItems = new List<Item>(8);
     }
 }
