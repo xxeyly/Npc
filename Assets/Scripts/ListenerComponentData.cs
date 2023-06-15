@@ -79,6 +79,14 @@ namespace XFramework
             {
                 return Instance.ExecuteReturnEvent<int,SmallPharmaceuticalApparatusSaveDataGroup>("ItemSlotDataSaveSceneComponent","GetSmallPharmaceuticalApparatusSaveDataGroup",arg0);
             }
+            public void SavePurchaseItemsSaveDataGroup(int arg0,Dictionary<ItemDemandItem,ItemDemandItemData> arg1)
+            {
+                Instance.ExecuteEvent("ItemSlotDataSaveSceneComponent","SavePurchaseItemsSaveDataGroup",arg0,arg1);
+            }
+            public PurchaseItemsSaveDataGroup GetPurchaseItemsSaveDataGroup(int arg0)
+            {
+                return Instance.ExecuteReturnEvent<int,PurchaseItemsSaveDataGroup>("ItemSlotDataSaveSceneComponent","GetPurchaseItemsSaveDataGroup",arg0);
+            }
         }
         public class ItemAtlasDisplay
         {
@@ -132,6 +140,10 @@ namespace XFramework
             {
                 return Instance.ExecuteReturnEvent<Item,bool>("PersonalBelongings","AddItem",arg0);
             }
+            public bool AddItem(Item arg0,int arg1)
+            {
+                return Instance.ExecuteReturnEvent<Item,int,bool>("PersonalBelongings","AddItem",arg0,arg1);
+            }
             public void SetDragItemSlot(ItemSlot arg0)
             {
                 Instance.ExecuteEvent("PersonalBelongings","SetDragItemSlot",arg0);
@@ -143,6 +155,10 @@ namespace XFramework
         }
         public class PurchaseItems
         {
+            public void InitStorageItem()
+            {
+                Instance.ExecuteEvent("PurchaseItems","InitStorageItem");
+            }
             public void AddNewItem(int arg0)
             {
                 Instance.ExecuteEvent("PurchaseItems","AddNewItem",arg0);

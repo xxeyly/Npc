@@ -131,12 +131,22 @@ public class PurchaseItems : BaseWindow
             return;
         }
 
-        DisPlayObj(false, _attributesDemand.gameObject);
+        DisPlayObj(false, _attributesDemand.gameObject, _exchangeItems.gameObject, _remove.gameObject);
         DisPlayObj(true, _tip);
         //设置为空
         currentOperationItemDemandItem.SetNull();
         if (itemDemandItemDataDic.ContainsKey(currentOperationItemDemandItem))
         {
+            foreach (ItemSlot itemSlot in _exchangeItemsContent)
+            {
+                if (itemSlot.item != null)
+                {
+                    ListenerFrameComponent.Instance.personalBelongings.AddItem(itemSlot.item);
+                    itemSlot.AddItem(null);
+                }
+            }
+
+            //包含的物品放回到背包中
             itemDemandItemDataDic.Remove(currentOperationItemDemandItem);
         }
     }
@@ -146,6 +156,27 @@ public class PurchaseItems : BaseWindow
     #region 自定义属性
 
     #endregion 自定义属性
+
+    [AddListenerEvent]
+    private void InitStorageItem()
+    {
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataSaveEvent(Save);
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SetItemSlotDataLoadEvent(Load);
+    }
+
+    private void Load()
+    {
+        PurchaseItemsSaveDataGroup purchaseItemsSaveDataGroup = ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.GetPurchaseItemsSaveDataGroup(3);
+        if (purchaseItemsSaveDataGroup == null)
+        {
+            return;
+        }
+    }
+
+    private void Save()
+    {
+        ListenerFrameComponent.Instance.itemSlotDataSaveSceneComponent.SavePurchaseItemsSaveDataGroup(3, itemDemandItemDataDic);
+    }
 
     protected override void Update()
     {
@@ -277,12 +308,14 @@ public class PurchaseItems : BaseWindow
     {
         itemDemandItemDataDic[itemDemandItem].attributeValue[attributeValue] = value;
     }
+}
 
-    [Serializable]
-    [LabelText("收购数据")]
-    public class ItemDemandItemData
-    {
-        [LabelText("所需物品属性")] public Dictionary<AttributeValue, Vector2> attributeValue = new Dictionary<AttributeValue, Vector2>();
-        [LabelText("交换物品")] public List<Item> exchangeItems = new List<Item>(8);
-    }
+[Serializable]
+[LabelText("收购数据")]
+public class ItemDemandItemData
+{
+    [LabelText("格子索引")] public int itemDemandItemIndex;
+    [LabelText("格子物品")] public Item itemDemandItem;
+    [LabelText("所需物品属性")] public Dictionary<AttributeValue, Vector2> attributeValue = new Dictionary<AttributeValue, Vector2>();
+    [LabelText("交换物品")] public List<Item> exchangeItems = new List<Item>(8);
 }

@@ -278,6 +278,11 @@ public class GenerateListenerComponent
             return "List<" + type.GetGenericArguments()[0].Name + ">";
         }
 
+        if (type.Name == typeof(Dictionary<,>).Name)
+        {
+            return "Dictionary<" + type.GetGenericArguments()[0].Name + "," + type.GetGenericArguments()[1].Name + ">";
+        }
+
         return type.Name;
     }
 
